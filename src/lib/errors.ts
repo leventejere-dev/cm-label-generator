@@ -186,8 +186,9 @@ const CATALOGUE: Record<ErrorCode, { title: string; detail: string; retryable: b
     retakeAdvised: false,
   },
   NOT_CONFIGURED: {
-    title: 'The app is not connected to Supabase yet',
-    detail: 'Set VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY, or switch on mock mode to try the workflow without a backend.',
+    title: 'Label reading is not switched on yet',
+    detail:
+      'The app is installed and working, but the image-reading service still has to be activated by whoever administers it. Nothing you did is wrong — please pass this message on and try again afterwards.',
     retryable: false,
     retakeAdvised: false,
   },
