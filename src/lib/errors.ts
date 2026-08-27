@@ -20,6 +20,7 @@ export type ErrorCode =
   | 'AI_TIMEOUT'
   | 'AI_PROVIDER_ERROR'
   | 'AI_RATE_LIMITED'
+  | 'AI_DAILY_LIMIT'
   | 'AI_INVALID_JSON'
   | 'NO_LABEL_DETECTED'
   | 'MULTIPLE_LABELS_DETECTED'
@@ -185,10 +186,17 @@ const CATALOGUE: Record<ErrorCode, { title: string; detail: string; retryable: b
     retryable: true,
     retakeAdvised: false,
   },
+  AI_DAILY_LIMIT: {
+    title: "Today's free label readings are used up",
+    detail:
+      'The free daily allowance for reading labels has run out. It resets automatically overnight — until then you can still fill the fields in by hand and print the label as usual.',
+    retryable: false,
+    retakeAdvised: false,
+  },
   NOT_CONFIGURED: {
     title: 'Label reading is not switched on yet',
     detail:
-      'The app is installed and working, but the image-reading service still has to be activated by whoever administers it. Nothing you did is wrong — please pass this message on and try again afterwards.',
+      'The app is installed and working, but the image-reading service still has to be activated by whoever administers it. Nothing you did is wrong \u2014 please pass this message on and try again afterwards.',
     retryable: false,
     retakeAdvised: false,
   },

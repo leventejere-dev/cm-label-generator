@@ -24,6 +24,7 @@ const ORDER = [
   '_shared/validation.ts',
   '_shared/providers/types.ts',
   '_shared/providers/anthropic.ts',
+  '_shared/providers/google.ts',
   '_shared/providers/openai.ts',
   '_shared/providers/index.ts',
   '_shared/rateLimit.ts',
@@ -33,6 +34,7 @@ const ORDER = [
 /** Per-file renames for module-scoped names that collide once concatenated. */
 const RENAMES = {
   '_shared/providers/anthropic.ts': { API_URL: 'ANTHROPIC_API_URL', DEFAULT_MODEL: 'ANTHROPIC_DEFAULT_MODEL' },
+  '_shared/providers/google.ts': { API_BASE: 'GOOGLE_API_BASE', DEFAULT_MODEL: 'GOOGLE_DEFAULT_MODEL' },
   '_shared/providers/openai.ts': { API_URL: 'OPENAI_API_URL', DEFAULT_MODEL: 'OPENAI_DEFAULT_MODEL' },
 };
 
@@ -82,6 +84,20 @@ import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.45.4';
 import type { SupabaseClient } from 'https://esm.sh/@supabase/supabase-js@2.45.4';
 `;
 
+// A provider added to the folder but forgotten in ORDER would produce a bundle
+// that references a class it never defines — and that only shows up at runtime,
+// in production. Catch it here instead.
+const providerDir = path.join(base, '_shared', 'providers');
+const missing = fs
+  .readdirSync(providerDir)
+  .filter((f) => f.endsWith('.ts') && !f.endsWith('.test.ts'))
+  .map((f) => `_shared/providers/${f}`)
+  .filter((rel) => !ORDER.includes(rel));
+if (missing.length) {
+  console.error('Provider files missing from ORDER: ' + missing.join(', '));
+  process.exit(1);
+}
+
 const chunks = [header];
 for (const rel of ORDER) {
   let body = stripImports(fs.readFileSync(path.join(base, rel), 'utf8'));
@@ -101,7 +117,10 @@ if (leftovers.length) {
   process.exit(1);
 }
 
-const names = [...bundle.matchAll(/^(?:export )?(?:const|function|class|interface|type|enum) (\w+)/gm)].map((m) => m[1]);
+// `async function` and `export async function` must be matched too: two files
+// each declaring `async function toProviderError` is legal JS (last one wins) but
+// silently gives every provider the wrong error mapper.
+const names = [...bundle.matchAll(/^(?:export\s+)?(?:declare\s+)?(?:async\s+)?(?:const|let|var|function|class|interface|type|enum)\s+(\w+)/gm)].map((m) => m[1]);
 const dupes = names.filter((n, i) => names.indexOf(n) !== i);
 if (dupes.length) {
   console.error('Duplicate top-level declarations: ' + [...new Set(dupes)].join(', '));

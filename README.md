@@ -77,12 +77,14 @@ This tool removes that problem without anyone retyping a label:
   survive a refresh and a deep link with zero server configuration.
 * **Supabase Edge Functions** — the only server-side piece needed. The AI key lives in a
   function secret; the browser only ever holds the public anon key.
-* **Anthropic Claude as the default vision model** — photographed technical documents with
-  small multilingual print are what it is strongest at, and forced tool use returns
-  schema-shaped JSON without post-hoc repair. It is *not* wired in directly: both the
-  server (`supabase/functions/_shared/providers/`) and the client
-  (`src/features/extraction/provider.ts`) talk to a `LabelExtractionProvider` interface.
-  Switching to OpenAI is one secret: `supabase secrets set AI_PROVIDER=openai`.
+* **Google Gemini as the default vision model** — the deciding factor was cost, not
+  capability: the Gemini Flash models have a genuinely free tier with image input, which
+  is what lets this run without a per-scan bill. Anthropic Claude is the stronger reader of
+  small multilingual print and stays available as a paid alternative, as does OpenAI. None
+  of them is wired in directly: both the server
+  (`supabase/functions/_shared/providers/`) and the client
+  (`src/features/extraction/provider.ts`) talk to a `LabelExtractionProvider` interface, so
+  switching vendor is one secret: `supabase secrets set AI_PROVIDER=anthropic`.
 * **One wide JSONB table** rather than a normalised field model — supplier labels are not
   standardized, the field set changes with every new supplier, and every query is either
   "this label" or "the last N labels".
@@ -241,8 +243,11 @@ Edit the modular files under `supabase/functions/`, never the bundle — then re
 frontend, or in the repository.
 
 ```bash
-# Anthropic (default)
-supabase secrets set ANTHROPIC_API_KEY=sk-ant-...
+# Google Gemini (default) — free tier, no card required
+supabase secrets set GOOGLE_API_KEY=...
+
+# or Anthropic
+supabase secrets set AI_PROVIDER=anthropic ANTHROPIC_API_KEY=sk-ant-...
 
 # or OpenAI
 supabase secrets set AI_PROVIDER=openai OPENAI_API_KEY=sk-...
@@ -253,6 +258,18 @@ supabase secrets set ALLOWED_ORIGINS=https://<you>.github.io,http://localhost:51
 supabase secrets set RATE_LIMIT_MAX=40 RATE_LIMIT_WINDOW_SECONDS=300
 ```
 
+Get a Gemini key at <https://aistudio.google.com/apikey> — no credit card, no billing
+account. `AI_PROVIDER` may be omitted: whichever key is present is used, Google first.
+
+**On the free tier and confidentiality.** Google's default terms for unpaid use say
+submitted content may be used to improve its products and may be read by human reviewers.
+That would be disqualifying for supplier documents. The exception is what makes this
+workable here: Google's API terms state that for users **in the European Economic Area,
+Switzerland or the UK, the paid-service data terms apply to all services, including the
+unpaid Gemini API quota** — no training on your content, no human review. Color Metal is in
+Romania, so that is the applicable regime. Re-check this before deploying the app outside
+the EEA, and prefer a paid provider there.
+
 Or from the dashboard: **Project settings → Edge Functions → Secrets**.
 `supabase/functions/.env.example` documents every variable.
 
@@ -260,8 +277,13 @@ Or from the dashboard: **Project settings → Edge Functions → Secrets**.
 do not set them yourself.
 
 > **Model IDs move.** `AI_MODEL` exists precisely so you never have to edit code when a
-> newer Claude or GPT release comes out. The defaults are in
-> `supabase/functions/_shared/providers/anthropic.ts` and `openai.ts`.
+> newer Gemini, Claude or GPT release comes out. The defaults are in
+> `supabase/functions/_shared/providers/google.ts`, `anthropic.ts` and `openai.ts`.
+
+> **The free tier has a daily ceiling, not just a per-minute one.** The Gemini provider
+> tells the two apart and the app says *"Today's free label readings are used up"* rather
+> than *"wait a minute"*, because the difference is an afternoon of someone's time. Manual
+> entry keeps working when that happens.
 
 ### 5.5 Point the frontend at Supabase
 
