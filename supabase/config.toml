@@ -1,0 +1,31 @@
+# Supabase CLI project configuration.
+# `project_id` is used for local development (`supabase start`).
+project_id = "cm-label-generator"
+
+[api]
+enabled = true
+port = 54321
+schemas = ["public", "storage"]
+extra_search_path = ["public", "extensions"]
+max_rows = 1000
+
+[db]
+port = 54322
+major_version = 15
+
+[storage]
+enabled = true
+# Matches the bucket limit set in the storage migration.
+file_size_limit = "8MiB"
+
+[auth]
+enabled = true
+# Authentication is NOT used by the MVP. It is left enabled so Supabase Auth can
+# be switched on later without changing the project configuration.
+site_url = "http://localhost:5173"
+additional_redirect_urls = ["http://localhost:5173"]
+
+[functions.extract-label]
+# The MVP has no login, so the function must accept calls carrying only the anon
+# key. Set this to true (and add Supabase Auth) to require a signed-in user.
+verify_jwt = false

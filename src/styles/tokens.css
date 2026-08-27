@@ -1,0 +1,77 @@
+/* ---------------------------------------------------------------------------
+   DESIGN TOKENS
+   Brand colours are injected at boot by branding/brand.ts (applyBrandTokens).
+   The values below are the fallbacks used before that runs and by anything
+   rendered outside React.
+   --------------------------------------------------------------------------- */
+
+:root {
+  /* Brand — mirrored from branding/brand.ts */
+  --cm-brand-gold: #bfa060;
+  --cm-brand-gold-deep: #9c8049;
+  --cm-brand-gold-soft: #f6f0e4;
+  --cm-brand-grey: #939393;
+  --cm-brand-primary: #3a3a3c;
+  --cm-brand-primary-deep: #2a2a2c;
+  --cm-brand-primary-soft: #4e4e51;
+  --cm-brand-accent: #bfa060;
+  --cm-brand-accent-soft: #f6f0e4;
+
+  --cm-ink: #2e2e30;
+  --cm-ink-muted: #6e6f71;
+  --cm-ink-faint: #98999b;
+  --cm-surface: #ffffff;
+  --cm-surface-sunken: #f6f6f5;
+  --cm-surface-raised: #ffffff;
+  --cm-border: #e1e0dd;
+  --cm-border-strong: #c2c1bd;
+
+  --cm-ok: #1f6b4b;
+  --cm-ok-soft: #e8f1ed;
+  --cm-warn: #8a6212;
+  --cm-warn-soft: #faf2e2;
+  --cm-danger: #a6231b;
+  --cm-danger-soft: #fbe9e7;
+
+  /* Typography */
+  --cm-font-ui: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue',
+    Arial, 'Noto Sans', sans-serif;
+  --cm-font-mono: ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas,
+    'Liberation Mono', monospace;
+
+  --cm-text-xs: 0.6875rem; /* 11px */
+  --cm-text-sm: 0.8125rem; /* 13px */
+  --cm-text-base: 0.9375rem; /* 15px */
+  --cm-text-md: 1.0625rem; /* 17px */
+  --cm-text-lg: 1.25rem;
+  --cm-text-xl: 1.5rem;
+  --cm-text-2xl: 1.875rem;
+
+  /* Spacing scale (4px base) */
+  --cm-space-1: 0.25rem;
+  --cm-space-2: 0.5rem;
+  --cm-space-3: 0.75rem;
+  --cm-space-4: 1rem;
+  --cm-space-5: 1.25rem;
+  --cm-space-6: 1.5rem;
+  --cm-space-8: 2rem;
+  --cm-space-10: 2.5rem;
+  --cm-space-12: 3rem;
+
+  --cm-radius-sm: 6px;
+  --cm-radius: 10px;
+  --cm-radius-lg: 14px;
+
+  --cm-shadow-sm: 0 1px 2px rgba(20, 28, 36, 0.06);
+  --cm-shadow: 0 1px 3px rgba(20, 28, 36, 0.08), 0 6px 18px rgba(20, 28, 36, 0.05);
+  --cm-shadow-lg: 0 12px 32px rgba(20, 28, 36, 0.16);
+
+  --cm-tap-target: 48px;
+  --cm-content-max: 1180px;
+
+  /* Safe areas for iPhone notch / home indicator */
+  --cm-safe-top: env(safe-area-inset-top, 0px);
+  --cm-safe-bottom: env(safe-area-inset-bottom, 0px);
+
+  --cm-transition: 140ms cubic-bezier(0.2, 0, 0.2, 1);
+}

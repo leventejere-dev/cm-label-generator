@@ -1,0 +1,80 @@
+/* ---------------------------------------------------------------------------
+   PRINT
+   Target: 210 × 297 mm on an ordinary office laser printer.
+   The application chrome disappears; the A4 sheet becomes the whole page.
+   --------------------------------------------------------------------------- */
+
+@page {
+  size: A4 portrait;
+  /* The sheet carries its own 12 mm margin, so the page margin is zero.
+     If your printer refuses to print that close to the edge, change this to
+     `margin: 5mm` and reduce .a4-sheet padding by the same amount. */
+  margin: 0;
+}
+
+@media print {
+  html,
+  body {
+    background: #fff !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    width: 210mm;
+  }
+
+  /* Anything the operator interacts with is not part of the document. */
+  .no-print,
+  .app-bar,
+  .app-footer,
+  .action-bar {
+    display: none !important;
+  }
+
+  /* Neutralise every layout ancestor between <body> and the sheet. */
+  #root,
+  .app-shell,
+  .app-main,
+  .print-reset {
+    display: block !important;
+    max-width: none !important;
+    width: auto !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    background: #fff !important;
+    box-shadow: none !important;
+    border: none !important;
+    overflow: visible !important;
+    min-height: 0 !important;
+  }
+
+  /* Undo the preview scaling — print at true size. */
+  .a4-viewport {
+    height: auto !important;
+    overflow: visible !important;
+  }
+
+  .a4-scaler {
+    transform: none !important;
+    width: 210mm !important;
+  }
+
+  .a4-sheet {
+    box-shadow: none !important;
+    border: none !important;
+    width: 210mm !important;
+    height: 297mm !important;
+    page-break-after: avoid;
+    page-break-inside: avoid;
+    break-inside: avoid;
+  }
+
+  /* Keep tinted section headers and rules visible on paper. */
+  .a4-sheet,
+  .a4-sheet * {
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  a[href]::after {
+    content: '' !important;
+  }
+}

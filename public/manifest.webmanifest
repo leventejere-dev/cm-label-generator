@@ -1,0 +1,14 @@
+{
+  "name": "CM Label Generator",
+  "short_name": "CM Labels",
+  "description": "Scan a supplier material label and generate a standardized Color Metal A4 label.",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#FFFFFF",
+  "theme_color": "#141C24",
+  "icons": [
+    { "src": "./branding/favicon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" }
+  ]
+}

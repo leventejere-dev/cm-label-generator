@@ -1,0 +1,337 @@
+/* ---------------------------------------------------------------------------
+   COLOR METAL A4 LABEL
+   ---------------------------------------------------------------------------
+   Physical dimensions are in millimetres so the on-screen preview and the
+   printed sheet are the same document. The preview is scaled with a CSS
+   transform on .a4-scaler; printing removes that transform.
+
+   Deliberately monochrome apart from one accent rule: an operational warehouse
+   label must print identically on any office laser printer, including one with
+   no colour toner.
+   --------------------------------------------------------------------------- */
+
+.a4-viewport {
+  position: relative;
+  width: 100%;
+  overflow: hidden;
+}
+
+.a4-scaler {
+  transform: scale(var(--a4-scale, 1));
+  transform-origin: top left;
+  width: 210mm;
+}
+
+.a4-sheet {
+  width: 210mm;
+  height: 297mm;
+  padding: 12mm 12mm 10mm;
+  background: #fff;
+  color: #2e2e30;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  font-family: var(--cm-font-ui);
+  /* Fixed 1mm = 1mm typography: sizes below are in pt for print fidelity. */
+  font-size: 9pt;
+  line-height: 1.35;
+  box-shadow: var(--cm-shadow-lg);
+}
+
+/* --- header --------------------------------------------------------------- */
+
+.a4__header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 8mm;
+  padding-bottom: 4mm;
+}
+
+.a4__brand {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5mm;
+}
+
+.a4__logo {
+  height: 11mm;
+  width: auto;
+  max-width: 84mm;
+  object-fit: contain;
+  object-position: left center;
+}
+
+.a4__productline {
+  font-size: 6pt;
+  letter-spacing: 0.16em;
+  color: #939393;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.a4__wordmark {
+  font-size: 22pt;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  line-height: 1;
+}
+
+.a4__wordmark-sub {
+  font-size: 7pt;
+  letter-spacing: 0.22em;
+  color: #6e6f71;
+  text-transform: uppercase;
+}
+
+.a4__docmeta {
+  text-align: right;
+}
+
+.a4__doctitle {
+  font-size: 11pt;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.a4__cmid-label {
+  margin-top: 2mm;
+  font-size: 6.5pt;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: #6e6f71;
+}
+
+.a4__cmid {
+  font-family: var(--cm-font-mono);
+  font-size: 14pt;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+}
+
+.a4__rule {
+  display: flex;
+  height: 1.2mm;
+  margin-bottom: 5mm;
+}
+
+.a4__rule-main { flex: 1; background: #2e2e30; }
+.a4__rule-accent { width: 34mm; background: var(--cm-brand-gold, #bfa060); }
+
+/* --- hero ----------------------------------------------------------------- */
+
+/* --- delivery block ------------------------------------------------------- */
+
+.a4__delivery {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2mm 8mm;
+  padding: 3mm 4mm;
+  margin-bottom: 5mm;
+  border: 0.35mm solid #c2c1bd;
+  border-left: 1.2mm solid var(--cm-brand-gold, #bfa060);
+  border-radius: 1mm;
+  background: #fafaf9;
+}
+
+.a4__delivery-item { min-width: 0; }
+
+.a4__delivery-label {
+  font-size: 6.5pt;
+  font-weight: 700;
+  letter-spacing: 0.13em;
+  text-transform: uppercase;
+  color: #6e6f71;
+}
+
+.a4__delivery-value {
+  font-size: 11pt;
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+.a4__hero { margin-bottom: 5mm; }
+
+.a4__headline {
+  font-size: 20pt;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+  line-height: 1.1;
+  text-transform: uppercase;
+}
+
+.a4__subheadline {
+  margin-top: 1.5mm;
+  font-size: 30pt;
+  font-weight: 700;
+  line-height: 1.05;
+  letter-spacing: -0.01em;
+  font-variant-numeric: tabular-nums;
+}
+
+.a4__descriptors {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2mm;
+  margin-top: 3mm;
+}
+
+.a4__chip {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 1.6mm;
+  padding: 1.2mm 2.6mm;
+  border: 0.3mm solid #c2c1bd;
+  border-radius: 1mm;
+  font-size: 8.5pt;
+}
+
+.a4__chip-label {
+  font-size: 6.5pt;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: #6e6f71;
+}
+
+.a4__chip-value { font-weight: 700; }
+
+/* --- metrics -------------------------------------------------------------- */
+
+.a4__metrics {
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: 1fr;
+  gap: 3mm;
+  margin-bottom: 6mm;
+}
+
+.a4__metric {
+  border: 0.35mm solid #2e2e30;
+  border-radius: 1mm;
+  padding: 2.5mm 3mm 3mm;
+  min-width: 0;
+}
+
+.a4__metric-label {
+  font-size: 6.5pt;
+  font-weight: 700;
+  letter-spacing: 0.13em;
+  text-transform: uppercase;
+  color: #6e6f71;
+}
+
+.a4__metric-value {
+  margin-top: 0.8mm;
+  font-size: 19pt;
+  font-weight: 700;
+  line-height: 1.05;
+  font-variant-numeric: tabular-nums;
+  word-break: break-word;
+}
+
+/* --- sections ------------------------------------------------------------- */
+
+/*
+  Two-column newspaper flow rather than a grid: sections keep their document
+  order (product information first, where it belongs) and the two columns are
+  balanced automatically instead of leaving ragged grid rows.
+
+  A section is never split across columns. If the content still does not fit,
+  A4Label detects the overflow and the operator is told, rather than losing a
+  row silently.
+*/
+.a4__sections {
+  columns: 2;
+  column-gap: 6mm;
+  column-fill: balance;
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.a4__section {
+  break-inside: avoid;
+  -webkit-column-break-inside: avoid;
+  page-break-inside: avoid;
+  margin-bottom: 4mm;
+}
+
+.a4__section-title {
+  font-size: 7pt;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: #2e2e30;
+  padding: 1.2mm 2mm;
+  background: #f1efea;
+  border-left: 0.8mm solid #2e2e30;
+  margin-bottom: 1.5mm;
+}
+
+.a4__rows { width: 100%; border-collapse: collapse; }
+
+.a4__rows tr { border-bottom: 0.2mm solid #e1e0dd; }
+.a4__rows tr:last-child { border-bottom: none; }
+
+.a4__rows th {
+  width: 38%;
+  text-align: left;
+  vertical-align: top;
+  padding: 1.1mm 2mm 1.1mm 2mm;
+  font-size: 7.5pt;
+  font-weight: 500;
+  color: #6e6f71;
+}
+
+.a4__rows td {
+  text-align: left;
+  vertical-align: top;
+  padding: 1.1mm 2mm;
+  font-size: 9.5pt;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  word-break: break-word;
+}
+
+/* --- notes + footer ------------------------------------------------------- */
+
+.a4__notes {
+  margin-top: 4mm;
+  padding-top: 2mm;
+  border-top: 0.2mm dashed #c2c1bd;
+  font-size: 7pt;
+  color: #6e6f71;
+}
+
+.a4__notes li { margin-left: 4mm; }
+
+.a4__footer {
+  margin-top: auto;
+  padding-top: 3mm;
+  border-top: 0.5mm solid #2e2e30;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  gap: 6mm;
+  font-size: 7pt;
+  color: #6e6f71;
+}
+
+.a4__footer-strong {
+  font-weight: 700;
+  color: #2e2e30;
+  font-family: var(--cm-font-mono);
+  font-size: 8pt;
+}
+
+.a4__footer-right { text-align: right; }
+
+/* Reserved slot for a future Color Metal QR code. Hidden until enabled. */
+.a4__code-slot {
+  width: 22mm;
+  height: 22mm;
+  border: 0.3mm dashed #c2c1bd;
+  display: none;
+}
