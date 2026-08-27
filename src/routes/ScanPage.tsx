@@ -85,18 +85,34 @@ export function ScanPage() {
       });
       navigate(`/review/${outcome.record.id}`, { replace: true });
     } catch (cause) {
+      // A scan the person cancelled is not a failure and must not be reported
+      // as one — an aborted fetch otherwise surfaces as a camera error.
+      if (controller.signal.aborted) return;
       setError(toAppError(cause));
       setStep('error');
     } finally {
-      abortRef.current = null;
+      if (abortRef.current === controller) abortRef.current = null;
     }
   }, [processed, navigate, setScanResult]);
 
   const retake = useCallback(() => {
+    abortRef.current?.abort();
     clearCapture();
     setError(null);
     setStep('camera');
   }, [clearCapture]);
+
+  /**
+   * A scan that hangs must always have a way out. Aborting returns to the photo
+   * we already have, so cancelling costs the person the wait — never the photo.
+   */
+  const cancelAnalysis = useCallback(() => {
+    abortRef.current?.abort();
+    abortRef.current = null;
+    setError(null);
+    setStages([]);
+    setStep('preview');
+  }, []);
 
   if (step === 'camera') {
     return (
@@ -135,7 +151,9 @@ export function ScanPage() {
           />
         ) : null}
 
-        {step === 'processing' ? <ProcessingView stages={stages} /> : null}
+        {step === 'processing' ? (
+          <ProcessingView stages={stages} onCancel={cancelAnalysis} />
+        ) : null}
 
         {step === 'error' && error ? (
           <div className="stack">

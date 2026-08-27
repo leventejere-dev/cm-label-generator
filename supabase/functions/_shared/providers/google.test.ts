@@ -160,6 +160,63 @@ Deno.test('falls back to another free model when the default one is gone', async
   }
 });
 
+Deno.test('asks the model not to spend time thinking, per model family', async () => {
+  // Reading a printed label is transcription. Left at its default the model
+  // spent ~16 s of a warehouse employee's time reasoning about it. The knob has
+  // a different name on each generation and the wrong one is a 400.
+  const three = stubFetch(() => ok({ candidates: [{ content: { parts: [{ text: '{}' }] } }] }));
+  try {
+    await new GoogleProvider('K', 'gemini-3.5-flash').extract(INPUT);
+    assertEquals(three.calls[0].body.generationConfig.thinkingConfig, { thinkingLevel: 'minimal' });
+  } finally {
+    three.restore();
+  }
+
+  const twoFive = stubFetch(() => ok({ candidates: [{ content: { parts: [{ text: '{}' }] } }] }));
+  try {
+    await new GoogleProvider('K', 'gemini-2.5-flash').extract(INPUT);
+    assertEquals(twoFive.calls[0].body.generationConfig.thinkingConfig, { thinkingBudget: 0 });
+  } finally {
+    twoFive.restore();
+  }
+});
+
+Deno.test('drops the thinking setting rather than failing the scan over it', async () => {
+  let n = 0;
+  const stub = stubFetch(() => {
+    n += 1;
+    if (n === 1) {
+      return new Response('{"error":{"code":400,"message":"Unknown name \\"thinkingConfig\\""}}', { status: 400 });
+    }
+    return ok({ candidates: [{ content: { parts: [{ text: '{"documentType":"material_label"}' }] } }] });
+  });
+  try {
+    const result = await new GoogleProvider('K', 'gemini-3.5-flash').extract(INPUT);
+    assertEquals(stub.calls.length, 2);
+    assertEquals(stub.calls[1].body.generationConfig.thinkingConfig, undefined);
+    // ...and the retry must not have thrown away the JSON request as well.
+    assertEquals(stub.calls[1].body.generationConfig.responseMimeType, 'application/json');
+    assertEquals((result.data as any).documentType, 'material_label');
+  } finally {
+    stub.restore();
+  }
+});
+
+Deno.test('a bad key is never mistaken for a bad config field', async () => {
+  // isKeyRejection is checked before the config ladder: otherwise a mistyped key
+  // would burn three requests re-asking the same rejected question.
+  const stub = stubFetch(() =>
+    new Response('{"error":{"code":400,"message":"API key not valid. Please pass a valid API key."}}', { status: 400 }),
+  );
+  try {
+    const error = await assertRejects(() => new GoogleProvider('bad').extract(INPUT), ProviderError);
+    assertEquals((error as ProviderError).code, 'PROVIDER_NOT_CONFIGURED');
+    assertEquals(stub.calls.length, 1);
+  } finally {
+    stub.restore();
+  }
+});
+
 Deno.test('an overloaded model is retried on the next free model', async () => {
   // Seen in production on day one: the free tier answered 503 UNAVAILABLE
   // ("This model is currently experiencing high demand"). That must not end the

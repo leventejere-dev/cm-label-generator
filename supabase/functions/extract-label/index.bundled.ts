@@ -827,6 +827,13 @@ const GOOGLE_DEFAULT_MODEL = 'gemini-3.5-flash';
  */
 const FALLBACK_MODELS = ['gemini-2.5-flash', 'gemini-3.5-flash-lite'];
 
+/**
+ * Stop starting new attempts once this much of the call has already gone. The
+ * caller aborts the whole thing at AI_TIMEOUT_MS (75s by default); leaving room
+ * means a busy provider is reported as busy instead of as a timeout.
+ */
+const FALLBACK_DEADLINE_MS = 35_000;
+
 export class GoogleProvider implements LabelExtractionProvider {
   readonly id = 'google';
   readonly model: string;
@@ -842,8 +849,15 @@ export class GoogleProvider implements LabelExtractionProvider {
 
   async extract(input: ExtractionInput): Promise<ExtractionOutput> {
     let lastError: ProviderError | undefined;
+    const startedAt = Date.now();
 
     for (const model of this.candidates) {
+      // Falling back is only worth it if the answer can still arrive in time.
+      // Without this the chain quietly spends the caller's whole timeout and
+      // the person is left watching a spinner for over a minute — which is a
+      // worse outcome than being told early that the service is busy.
+      if (lastError && Date.now() - startedAt > FALLBACK_DEADLINE_MS) break;
+
       try {
         return await this.extractWith(model, input);
       } catch (error) {
@@ -868,15 +882,29 @@ export class GoogleProvider implements LabelExtractionProvider {
   }
 
   private async extractWith(model: string, input: ExtractionInput): Promise<ExtractionOutput> {
-    // First attempt asks for JSON mime type. If a model rejects that field we
-    // retry once in plain-text mode; parseModelJson strips code fences anyway.
-    let response = await this.call(model, input, true);
+    // Ask for everything we want, then drop exactly the field the model names
+    // in its complaint. Google moves these knobs between model generations, so
+    // a scan must never fail over a config field nobody reads — but giving up a
+    // field it did not object to would waste a whole round trip.
+    const variant: CallVariant = { jsonMime: true, thinking: true };
+    let response = await this.call(model, input, variant);
 
-    if (response.status === 400) {
+    // At most one concession per field, hence the bounded loop.
+    for (let attempt = 0; attempt < 2 && response.status === 400; attempt += 1) {
       const peek = await response.clone().text().catch(() => '');
-      if (/response_?mime_?type|generation_?config/i.test(peek) && !isKeyRejection(peek)) {
-        response = await this.call(model, input, false);
+      if (isKeyRejection(peek) || isModelMissing(peek)) break;
+
+      const before = { ...variant };
+      if (variant.thinking && /thinking/i.test(peek)) variant.thinking = false;
+      else if (variant.jsonMime && /response_?mime_?type|response_?schema/i.test(peek)) variant.jsonMime = false;
+      else if (/generation_?config/i.test(peek)) {
+        // The config was refused without naming a field: give up both.
+        variant.thinking = false;
+        variant.jsonMime = false;
       }
+
+      if (variant.thinking === before.thinking && variant.jsonMime === before.jsonMime) break;
+      response = await this.call(model, input, variant);
     }
 
     if (!response.ok) {
@@ -921,7 +949,8 @@ export class GoogleProvider implements LabelExtractionProvider {
     };
   }
 
-  private call(model: string, input: ExtractionInput, jsonMime: boolean): Promise<Response> {
+  private call(model: string, input: ExtractionInput, variant: CallVariant): Promise<Response> {
+    const thinking = variant.thinking ? thinkingConfigFor(model) : undefined;
     const body = {
       systemInstruction: { parts: [{ text: input.systemPrompt }] },
       contents: [
@@ -936,7 +965,8 @@ export class GoogleProvider implements LabelExtractionProvider {
       generationConfig: {
         temperature: 0,
         maxOutputTokens: 8192,
-        ...(jsonMime ? { responseMimeType: 'application/json' } : {}),
+        ...(variant.jsonMime ? { responseMimeType: 'application/json' } : {}),
+        ...(thinking ? { thinkingConfig: thinking } : {}),
       },
     };
 
@@ -951,6 +981,23 @@ export class GoogleProvider implements LabelExtractionProvider {
       signal: input.signal ?? null,
     });
   }
+}
+
+interface CallVariant {
+  jsonMime: boolean;
+  thinking: boolean;
+}
+
+/**
+ * Reading a printed label is transcription, not reasoning — the model thinking
+ * about it at length costs the person holding the phone real seconds and buys
+ * nothing. The knob differs by model generation and sending the wrong one is a
+ * 400, so choose by family and let extractWith() drop it if it is refused.
+ */
+function thinkingConfigFor(model: string): Record<string, unknown> | undefined {
+  if (/^gemini-3/i.test(model)) return { thinkingLevel: 'minimal' };
+  if (/^gemini-2\.5/i.test(model)) return { thinkingBudget: 0 };
+  return undefined;
 }
 
 interface GeminiResponse {
