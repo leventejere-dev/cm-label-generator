@@ -19,13 +19,13 @@ export function ProcessingView({ stages }: { stages: StageSnapshot[] }) {
   return (
     <div className="stack">
       <div>
-        <h1 className="page-title">Analysing label</h1>
+        <h1 className="page-title">Se analizează eticheta</h1>
         <p className="page-subtitle">
-          This normally takes a few seconds. Keep the app open.
+          De obicei durează câteva secunde. Ține aplicația deschisă.
         </p>
       </div>
 
-      <div className="progress-track" role="progressbar" aria-label="Analysis in progress">
+      <div className="progress-track" role="progressbar" aria-label="Analiza este în curs">
         <div className="progress-track__bar" />
       </div>
 
@@ -45,7 +45,7 @@ export function ProcessingView({ stages }: { stages: StageSnapshot[] }) {
       </ul>
 
       <p className="muted" style={{ fontSize: 'var(--cm-text-xs)' }} aria-live="polite">
-        {seconds}s elapsed
+        Timp scurs: {seconds} s
       </p>
     </div>
   );

@@ -274,7 +274,7 @@ function normaliseFieldValue(
         code: 'NUMERIC_VALUE_COERCED',
         severity: 'warning',
         path,
-        message: `"${path}" arrived as a JSON number; trailing zeros may have been lost. Verify it against the photo.`,
+        message: `„${path}” a venit ca număr JSON; zerourile de la final se pot pierde. Verifică valoarea pe fotografie.`,
       });
     }
     const text = String(raw).trim();
@@ -289,7 +289,7 @@ function normaliseFieldValue(
       code: 'NUMERIC_VALUE_COERCED',
       severity: 'warning',
       path,
-      message: `"${path}" arrived as a JSON number; trailing zeros may have been lost. Verify it against the photo.`,
+      message: `„${path}” a venit ca număr JSON; zerourile de la final se pot pierde. Verifică valoarea pe fotografie.`,
     });
   }
   const text = String(value).trim();
@@ -361,7 +361,7 @@ function normaliseSensitive(raw: z.infer<typeof rawSensitiveItem>[] | null | und
         category: 'other',
         value,
         sourceText: null,
-        reason: 'Reported by the extraction model as supplier-identifying.',
+        reason: 'Semnalat de modelul de analiză ca informație care identifică furnizorul.',
         confidence: null,
       });
       continue;
@@ -379,7 +379,7 @@ function normaliseSensitive(raw: z.infer<typeof rawSensitiveItem>[] | null | und
       sourceText: normaliseOptionalString(item.sourceText ?? item.source_text),
       reason:
         normaliseOptionalString(item.reason) ??
-        'Reported by the extraction model as supplier-identifying.',
+        'Semnalat de modelul de analiză ca informație care identifică furnizorul.',
       confidence: toConfidence(item.confidence),
     });
   }
@@ -479,7 +479,7 @@ export function parseExtraction(input: unknown): ParseOutcome {
       code: 'SCHEMA_VALIDATION_FAILED',
       severity: 'error',
       message:
-        'The analysis service returned data in an unexpected format. Nothing was filled in automatically — please retake the photo or enter the values manually.',
+        'Serviciul de analiză a returnat datele într-un format neașteptat. Nu s-a completat nimic automat — refă fotografia sau introdu valorile manual.',
     });
     return { ok: false, result, fatalError: parsed.error.issues[0]?.message ?? 'Invalid payload' };
   }
@@ -506,7 +506,7 @@ export function parseExtraction(input: unknown): ParseOutcome {
         severity: 'warning',
         path: `additionalFields[${index}]`,
         message:
-          'An additional field arrived as a JSON number; trailing zeros may have been lost. Verify it against the photo.',
+          'Un câmp suplimentar a venit ca număr JSON; zerourile de la final se pot pierde. Verifică valoarea pe fotografie.',
       });
     }
     const text = String(value).trim();
@@ -515,7 +515,7 @@ export function parseExtraction(input: unknown): ParseOutcome {
       normaliseOptionalString(item.label) ??
       normaliseOptionalString(item.name) ??
       normaliseOptionalString(item.key) ??
-      'Additional field';
+      'Câmp suplimentar';
     const key = slugifyKey(normaliseOptionalString(item.key) ?? label);
     const groupCandidate = normaliseOptionalString(item.group);
     const group: FieldGroupId | 'additional' =

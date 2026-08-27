@@ -146,6 +146,23 @@ additionalFields[] entries are { "key", "label", "value", "confidence", "sourceT
 language) and "group" is one of product | quantity | traceability | dates | commercial |
 additional.
 
+=====================================================================
+8. LANGUAGE OF YOUR OWN PROSE
+=====================================================================
+The people who read your output are Color Metal staff in Romania, and the app
+around you is entirely in Romanian. So:
+
+- Write every sentence YOU compose in ROMANIAN, with correct diacritics
+  (ă â î ș ț): the "message" of each warning, the "reason" of each
+  sensitiveSupplierInformation entry, and codes.note.
+- Do NOT translate anything you READ off the label. "value" and the
+  additionalFields "label" caption are transcriptions and must stay exactly as
+  printed, in the supplier's original language — translating a caption or a
+  value would falsify the document.
+- When a Romanian sentence has to quote text from the label, quote it verbatim
+  in its original language, e.g.
+  „Greutățile sunt tipărite fără unitate de măsură (\"Net Wt. 690\").”
+
 Accuracy matters far more than completeness or prose. Work carefully.
 `.trim();
 
@@ -163,11 +180,11 @@ export const OUTPUT_SHAPE_HINT = `
     { "key": "product_code", "label": "Product code", "value": "500-0830/6060/T6/50/50/2/0/Mill-", "confidence": 0.8, "sourceText": "500-0830/…", "group": "product" }
   ],
   "sensitiveSupplierInformation": [
-    { "category": "supplier_logo", "value": "ALCOMET", "sourceText": "logo bottom left", "reason": "Supplier logo identifies the source of the material.", "confidence": 0.97 }
+    { "category": "supplier_logo", "value": "ALCOMET", "sourceText": "logo bottom left", "reason": "Logoul furnizorului arată de unde a fost cumpărat materialul.", "confidence": 0.97 }
   ],
-  "codes": { "barcodes": 0, "qrCodes": 1, "note": "One QR code beside the supplier logo; not decoded." },
+  "codes": { "barcodes": 0, "qrCodes": 1, "note": "Un cod QR lângă logoul furnizorului; nu a fost decodat." },
   "warnings": [
-    { "code": "UNIT_NOT_PRINTED", "severity": "warning", "path": "quantity.netWeight", "message": "Weights are printed without a unit." }
+    { "code": "UNIT_NOT_PRINTED", "severity": "warning", "path": "quantity.netWeight", "message": "Greutățile sunt tipărite fără unitate de măsură." }
   ],
   "overallConfidence": 0.91
 }

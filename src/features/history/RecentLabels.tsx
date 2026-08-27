@@ -21,7 +21,7 @@ const STATUS_TONE: Record<LabelStatus, 'neutral' | 'ok' | 'warn' | 'danger' | 'a
 function formatDate(iso: string): string {
   const date = new Date(iso);
   if (Number.isNaN(date.getTime())) return '—';
-  return new Intl.DateTimeFormat('en-GB', {
+  return new Intl.DateTimeFormat('ro-RO', {
     day: '2-digit',
     month: 'short',
     hour: '2-digit',
@@ -44,7 +44,7 @@ export function RecentLabels({
       <Card padded>
         <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
           <span className="spinner" />
-          <span className="muted">Loading labels…</span>
+          <span className="muted">Se încarcă etichetele…</span>
         </div>
       </Card>
     );
@@ -53,7 +53,7 @@ export function RecentLabels({
   if (records.length === 0) {
     return (
       <Card padded={false}>
-        <EmptyState>{emptyHint ?? 'No labels yet. Scan your first supplier label.'}</EmptyState>
+        <EmptyState>{emptyHint ?? 'Nicio etichetă încă. Scanează prima etichetă a furnizorului.'}</EmptyState>
       </Card>
     );
   }
@@ -70,7 +70,7 @@ export function RecentLabels({
                 <div className="list__row">
                   <div style={{ flex: 1, minWidth: 0 }}>
                     <div className="list__primary">
-                      {record.summaryProduct ?? 'Unidentified product'}
+                      {record.summaryProduct ?? 'Produs neidentificat'}
                     </div>
                     <div className="list__meta">
                       {formatDate(record.createdAt)}

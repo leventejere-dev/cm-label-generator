@@ -115,7 +115,7 @@ export function ScanPage() {
             }}
           >
             <span className="spinner" style={{ margin: '0 auto 12px', width: 24, height: 24 }} />
-            Optimising photo…
+            Se optimizează fotografia…
           </div>
         ) : null}
       </>
@@ -124,7 +124,7 @@ export function ScanPage() {
 
   return (
     <div className="app-shell">
-      <AppBar title="Scan label" back="/" />
+      <AppBar title="Scanare etichetă" back="/" />
       <main className="app-main">
         {step === 'preview' && processed ? (
           <PhotoPreview
@@ -145,14 +145,14 @@ export function ScanPage() {
             <div className="btn-row">
               {error.retryable && processed ? (
                 <Button variant="primary" onClick={() => void handleAnalyze()}>
-                  Retry analysis
+                  Reîncearcă analiza
                 </Button>
               ) : null}
               <Button variant={error.retakeAdvised ? 'primary' : 'secondary'} onClick={retake}>
-                Retake photo
+                Refă fotografia
               </Button>
               <Button variant="ghost" onClick={() => navigate('/')}>
-                Back to start
+                Înapoi la început
               </Button>
             </div>
           </div>

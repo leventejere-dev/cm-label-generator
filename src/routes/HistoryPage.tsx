@@ -31,11 +31,11 @@ export function HistoryPage() {
 
   return (
     <div className="app-shell">
-      <AppBar title="Recent labels" back="/" />
+      <AppBar title="Etichete recente" back="/" />
       <main className="app-main stack">
         <div>
-          <h1 className="page-title">Recent labels</h1>
-          <p className="page-subtitle">Open a previous label to view its data or reprint it.</p>
+          <h1 className="page-title">Etichete recente</h1>
+          <p className="page-subtitle">Deschide o etichetă anterioară ca să îi vezi datele sau ca să o tipărești din nou.</p>
         </div>
         {error ? (
           <Banner tone="danger" title={error.title}>

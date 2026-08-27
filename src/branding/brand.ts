@@ -66,7 +66,7 @@ export const company = {
   tagline: 'PARTNER IN ENGINEERING',
   productLine: 'ALUMINUM · COPPER · BRASS · BRONZE SEMI-FINISHED PRODUCTS',
   legalLine: import.meta.env.VITE_CM_COMPANY_LINE || 'SC COLOR-METAL SRL',
-  generator: 'CM Label Generator',
+  generator: 'Generator Etichete CM',
 } as const;
 
 /**

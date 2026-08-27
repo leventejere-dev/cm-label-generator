@@ -80,17 +80,17 @@ export function CameraScanner({ onCapture, onCancel }: CameraScannerProps) {
               <span className="camera__corner camera__corner--br" />
             </div>
             <p className="camera__hint">
-              Place the entire supplier label inside the frame.
+              Încadrează toată eticheta furnizorului.
               <br />
-              Fill the frame, hold still and let the camera focus.
+              Umple cadrul, stai nemișcat și lasă camera foto să focalizeze.
             </p>
           </div>
         ) : null}
 
         <div className="camera__topbar">
-          <button type="button" className="camera__chip" onClick={onCancel} aria-label="Cancel scanning">
+          <button type="button" className="camera__chip" onClick={onCancel} aria-label="Anulează scanarea">
             <IconClose size={18} />
-            Cancel
+            Anulează
           </button>
           {camera.torchAvailable ? (
             <button
@@ -100,7 +100,7 @@ export function CameraScanner({ onCapture, onCancel }: CameraScannerProps) {
               onClick={() => void camera.toggleTorch()}
             >
               <IconFlash size={18} />
-              {camera.torchOn ? 'Flash on' : 'Flash'}
+              {camera.torchOn ? 'Bliț pornit' : 'Bliț'}
             </button>
           ) : null}
         </div>
@@ -112,7 +112,7 @@ export function CameraScanner({ onCapture, onCancel }: CameraScannerProps) {
             <div className="stack" style={{ marginTop: 24, maxWidth: 360, marginInline: 'auto' }}>
               {error.retryable ? (
                 <Button variant="secondary" block onClick={() => void camera.start()}>
-                  Try the camera again
+                  Încearcă din nou camera foto
                 </Button>
               ) : null}
               <Button
@@ -121,10 +121,10 @@ export function CameraScanner({ onCapture, onCancel }: CameraScannerProps) {
                 icon={<IconCamera size={18} />}
                 onClick={() => fileInputRef.current?.click()}
               >
-                Use the phone camera app
+                Folosește aplicația foto a telefonului
               </Button>
               <Button variant="ghost" block onClick={onCancel}>
-                Back
+                Înapoi
               </Button>
             </div>
           </div>
@@ -133,7 +133,7 @@ export function CameraScanner({ onCapture, onCancel }: CameraScannerProps) {
         {camera.status === 'starting' ? (
           <div className="camera__fallback" style={{ position: 'absolute', inset: 0, display: 'grid', placeContent: 'center' }}>
             <span className="spinner" style={{ margin: '0 auto 12px', width: 24, height: 24 }} />
-            Starting camera…
+            Se pornește camera foto…
           </div>
         ) : null}
       </div>
@@ -145,7 +145,7 @@ export function CameraScanner({ onCapture, onCancel }: CameraScannerProps) {
               type="button"
               className="camera__chip"
               onClick={() => fileInputRef.current?.click()}
-              aria-label="Choose an existing photo"
+              aria-label="Alege o fotografie existentă"
             >
               <IconImage size={18} />
             </button>
@@ -156,7 +156,7 @@ export function CameraScanner({ onCapture, onCancel }: CameraScannerProps) {
             className="camera__shutter"
             onClick={() => void handleShutter()}
             disabled={camera.status !== 'ready' || capturing}
-            aria-label="Take photo"
+            aria-label="Fă fotografia"
           />
 
           <div className="camera__side" aria-hidden="true" />

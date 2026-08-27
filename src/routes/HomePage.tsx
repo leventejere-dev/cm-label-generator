@@ -36,13 +36,13 @@ export function HomePage() {
 
   return (
     <div className="app-shell">
-      <AppBar title="Label generator" />
+      <AppBar title="Generator etichete" />
       <main className="app-main stack">
         <section>
-          <h1 className="page-title">Scan a supplier label</h1>
+          <h1 className="page-title">Scanează eticheta furnizorului</h1>
           <p className="page-subtitle">
-            Photograph the label on the delivered material. Color Metal keeps the product data and
-            removes everything that identifies the supplier.
+            Fotografiază eticheta de pe materialul livrat. Color Metal păstrează datele produsului
+            și elimină tot ce identifică furnizorul.
           </p>
         </section>
 
@@ -57,10 +57,10 @@ export function HomePage() {
               navigate('/scan');
             }}
           >
-            Scan Label
+            Scanează eticheta
           </Button>
           <Button variant="secondary" size="lg" block onClick={() => navigate('/labels')}>
-            All labels
+            Toate etichetele
           </Button>
         </div>
 
@@ -68,10 +68,11 @@ export function HomePage() {
           <div style={{ display: 'flex', gap: 'var(--cm-space-3)', alignItems: 'flex-start' }}>
             <IconShield size={20} />
             <div style={{ fontSize: 'var(--cm-text-sm)' }}>
-              <strong>Supplier identity is never printed.</strong>
+              <strong>Identitatea furnizorului nu se tipărește niciodată.</strong>
               <p className="muted" style={{ marginTop: 2 }}>
-                Supplier names, logos, addresses, contact details and original barcodes are excluded
-                from the generated label. You can review exactly what was removed before printing.
+                Numele furnizorilor, logourile, adresele, datele de contact și codurile de bare
+                originale sunt excluse din eticheta generată. Poți verifica exact ce a fost eliminat
+                înainte de tipărire.
               </p>
             </div>
           </div>
@@ -79,10 +80,10 @@ export function HomePage() {
 
         <section>
           <SectionHeading
-            title="Recent labels"
+            title="Etichete recente"
             aside={
               <Link to="/labels" className="muted" style={{ fontSize: 'var(--cm-text-sm)' }}>
-                View all
+                Vezi toate
               </Link>
             }
           />
@@ -91,8 +92,8 @@ export function HomePage() {
       </main>
 
       <footer className="app-footer no-print">
-        <IconClock size={12} style={{ display: 'inline', verticalAlign: '-2px' }} /> CM Label
-        Generator {env.appVersion}
+        <IconClock size={12} style={{ display: 'inline', verticalAlign: '-2px' }} /> Generator
+        Etichete CM {env.appVersion}
       </footer>
     </div>
   );

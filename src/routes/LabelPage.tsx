@@ -106,10 +106,10 @@ export function LabelPage() {
   if (loaded.loading && !fromSession) {
     return (
       <div className="app-shell">
-        <AppBar title="Color Metal label" back="/" />
+        <AppBar title="Eticheta Color Metal" back="/" />
         <main className="app-main">
           <Card padded>
-            <span className="spinner" /> Preparing label…
+            <span className="spinner" /> Se pregătește eticheta…
           </Card>
         </main>
       </div>
@@ -119,13 +119,13 @@ export function LabelPage() {
   if (!record || !doc) {
     return (
       <div className="app-shell">
-        <AppBar title="Color Metal label" back="/" />
+        <AppBar title="Eticheta Color Metal" back="/" />
         <main className="app-main stack">
-          <Banner tone="danger" title={loaded.error?.title ?? 'Label not available'}>
-            {loaded.error?.detail ?? 'This label could not be opened.'}
+          <Banner tone="danger" title={loaded.error?.title ?? 'Eticheta nu este disponibilă'}>
+            {loaded.error?.detail ?? 'Această etichetă nu a putut fi deschisă.'}
           </Banner>
           <Button variant="primary" onClick={() => navigate('/')}>
-            Back to start
+            Înapoi la început
           </Button>
         </main>
       </div>
@@ -134,14 +134,14 @@ export function LabelPage() {
 
   return (
     <div className="app-shell">
-      <AppBar title="Color Metal label" back={`/review/${record.id}`} />
+      <AppBar title="Eticheta Color Metal" back={`/review/${record.id}`} />
       <main className="app-main stack print-reset">
         <div className="no-print" style={{ display: 'flex', alignItems: 'flex-end', gap: 'var(--cm-space-4)', flexWrap: 'wrap' }}>
           <div style={{ flex: 1, minWidth: 200 }}>
-            <h1 className="page-title">Color Metal label</h1>
+            <h1 className="page-title">Eticheta Color Metal</h1>
             <p className="page-subtitle">A5 · 148 × 210 mm · {record.cmId}</p>
           </div>
-          <div role="group" aria-label="Label language" style={{ display: 'flex', gap: 4 }}>
+          <div role="group" aria-label="Limba etichetei" style={{ display: 'flex', gap: 4 }}>
             {(['ro', 'en'] as const).map((code) => (
               <button
                 key={code}
@@ -161,15 +161,16 @@ export function LabelPage() {
         </div>
 
         {!labelHasContent(doc) ? (
-          <Banner tone="warn" title="This label is almost empty">
-            No product information was confirmed. Go back and fill in at least the product type and
-            dimensions before printing.
+          <Banner tone="warn" title="Eticheta este aproape goală">
+            Nu a fost confirmată nicio informație despre produs. Întoarce-te și completează cel
+            puțin tipul produsului și dimensiunile înainte de tipărire.
           </Banner>
         ) : null}
 
         {overflowing ? (
-          <Banner tone="warn" title="Some information does not fit on one page">
-            Remove less important additional fields on the review screen so everything prints.
+          <Banner tone="warn" title="O parte din informații nu încap pe o pagină">
+            Elimină câmpurile suplimentare mai puțin importante din ecranul de verificare, ca să se
+            tipărească tot.
           </Banner>
         ) : null}
 
@@ -181,7 +182,7 @@ export function LabelPage() {
 
         {doc.internalNotes.length > 0 ? (
           <div className="no-print">
-            <Banner tone="info" title="For your information — not printed on the label">
+            <Banner tone="info" title="Pentru informarea ta — nu se tipărește pe etichetă">
               <ul style={{ margin: '4px 0 0', paddingLeft: 18 }}>
                 {doc.internalNotes.map((note) => (
                   <li key={note}>{note}</li>
@@ -197,11 +198,12 @@ export function LabelPage() {
 
         <Card padded className="no-print">
           <p style={{ fontSize: 'var(--cm-text-sm)' }}>
-            <strong>Printing:</strong> use <em>Print label</em> and choose <strong>A5</strong>,
-            scale 100 % (not “fit to page”). If your printer only holds A4, print two labels per
-            sheet or select A5 and let the printer centre it. To keep a PDF, either pick “Save as
-            PDF” in the print dialog — which keeps every character exactly — or use{' '}
-            <em>Export PDF</em> for a downloadable vector file.
+            <strong>Tipărire:</strong> folosește <em>Tipărește eticheta</em> și alege{' '}
+            <strong>A5</strong>, scară 100 % (nu „potrivire în pagină”). Dacă imprimanta ta are doar
+            A4, tipărește două etichete pe o coală sau alege A5 și lasă imprimanta să o centreze. Ca
+            să păstrezi un PDF, fie alegi „Salvează ca PDF” în fereastra de tipărire — care
+            păstrează exact fiecare caracter — fie folosești <em>Exportă PDF</em> pentru un fișier
+            vectorial descărcabil.
           </p>
         </Card>
 
@@ -211,7 +213,7 @@ export function LabelPage() {
             icon={<IconEdit size={18} />}
             onClick={() => navigate(`/review/${record.id}`)}
           >
-            Edit data
+            Modifică datele
           </Button>
           <Button
             variant="secondary"
@@ -221,13 +223,13 @@ export function LabelPage() {
               navigate('/scan');
             }}
           >
-            New scan
+            Scanare nouă
           </Button>
         </div>
 
         <div className="action-bar no-print">
           <Button variant="primary" icon={<IconPrint size={18} />} onClick={handlePrint}>
-            Print label
+            Tipărește eticheta
           </Button>
           <Button
             variant="secondary"
@@ -235,11 +237,11 @@ export function LabelPage() {
             loading={pdfBusy}
             onClick={() => void handlePdf()}
           >
-            Export PDF
+            Exportă PDF
           </Button>
         </div>
 
-        <p className="app-footer no-print">CM Label Generator {env.appVersion}</p>
+        <p className="app-footer no-print">Generator Etichete CM {env.appVersion}</p>
       </main>
     </div>
   );

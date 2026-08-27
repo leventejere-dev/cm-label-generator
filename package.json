@@ -3,7 +3,7 @@
   "private": true,
   "version": "0.1.0",
   "type": "module",
-  "description": "CM Label Generator — photograph a supplier material label, extract it with multimodal AI, strip supplier identity, print a standardized Color Metal A4 label.",
+  "description": "Generator Etichete CM — fotografiază eticheta de material a furnizorului, citește-o cu AI multimodal, elimină orice urmă a furnizorului și tipărește o etichetă Color Metal standardizată A5.",
   "engines": {
     "node": ">=20.11"
   },

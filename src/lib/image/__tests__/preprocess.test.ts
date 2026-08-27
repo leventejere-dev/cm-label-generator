@@ -75,7 +75,9 @@ describe('photo quality heuristics', () => {
     const { brightness, sharpness } = analyseLuminance(flat(20), size, size);
     const report = gradeQuality(brightness, sharpness);
     expect(report.tooDark).toBe(true);
-    expect(report.advice.join(' ')).toMatch(/dark/i);
+    // By code, not by wording: the sentence is UI copy and is rewritten
+    // whenever the interface language or phrasing changes.
+    expect(report.advice.map((a) => a.code)).toContain('DARK');
   });
 
   it('flags a blurred, featureless photo', () => {

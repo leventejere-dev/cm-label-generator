@@ -15,7 +15,7 @@ function RouteFallback() {
       <main className="app-main">
         <div className="card card--padded" style={{ display: 'flex', gap: 10, alignItems: 'center' }}>
           <span className="spinner" />
-          <span className="muted">Loading…</span>
+          <span className="muted">Se încarcă…</span>
         </div>
       </main>
     </div>

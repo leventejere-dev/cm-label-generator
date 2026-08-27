@@ -26,12 +26,12 @@ import { preprocessImage, type ProcessedImage } from '../../lib/image/preprocess
 import { getExtractionProvider } from './provider';
 
 export const PIPELINE_STAGES = [
-  { id: 'optimising', label: 'Optimising photo' },
-  { id: 'uploading', label: 'Uploading image' },
-  { id: 'reading', label: 'Reading document' },
-  { id: 'identifying', label: 'Identifying product information' },
-  { id: 'removing', label: 'Removing supplier information' },
-  { id: 'preparing', label: 'Preparing Color Metal data' },
+  { id: 'optimising', label: 'Se optimizează fotografia' },
+  { id: 'uploading', label: 'Se încarcă imaginea' },
+  { id: 'reading', label: 'Se citește documentul' },
+  { id: 'identifying', label: 'Se identifică informațiile despre produs' },
+  { id: 'removing', label: 'Se elimină informațiile despre furnizor' },
+  { id: 'preparing', label: 'Se pregătesc datele Color Metal' },
 ] as const;
 
 export type PipelineStageId = (typeof PIPELINE_STAGES)[number]['id'];
@@ -227,7 +227,7 @@ export async function runScan(options: RunScanOptions): Promise<ScanOutcome> {
         {
           code: 'NOT_SAVED',
           severity: 'warning',
-          message: 'This label could not be saved to the database. You can still print it now.',
+          message: 'Eticheta nu a putut fi salvată în baza de date. O poți tipări în continuare.',
         },
       ],
       ...summary,

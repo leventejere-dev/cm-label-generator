@@ -15,7 +15,7 @@ export function RemovedPanel({ removed }: { removed: RemovedItem[] }) {
       <div className="disclosure">
         <div className="disclosure__summary" style={{ cursor: 'default' }}>
           <IconShield size={18} />
-          No supplier information was detected on this label
+          Nu s-a găsit nicio informație despre furnizor pe această etichetă
         </div>
       </div>
     );
@@ -28,13 +28,13 @@ export function RemovedPanel({ removed }: { removed: RemovedItem[] }) {
       summary={
         <>
           <IconShield size={18} />
-          Removed supplier information
+          Informații despre furnizor eliminate
           <Badge tone="neutral">{removed.length}</Badge>
         </>
       }
     >
       <p className="muted" style={{ fontSize: 'var(--cm-text-xs)', marginBottom: 'var(--cm-space-3)' }}>
-        Internal verification only. None of this appears on the Color Metal label.
+        Doar pentru verificare internă. Nimic de aici nu apare pe eticheta Color Metal.
       </p>
 
       {groups.map((group) => (
@@ -48,10 +48,10 @@ export function RemovedPanel({ removed }: { removed: RemovedItem[] }) {
                 <div className="removed-item__value">{item.value}</div>
                 <div className="removed-item__meta">
                   {item.reason}
-                  {item.path !== '-' ? ` · from ${item.path}` : ''}
+                  {item.path !== '-' ? ` · din ${item.path}` : ''}
                 </div>
               </div>
-              <Badge tone="danger">Excluded</Badge>
+              <Badge tone="danger">Exclus</Badge>
             </div>
           ))}
         </div>

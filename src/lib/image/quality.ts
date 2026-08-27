@@ -15,14 +15,24 @@
  * thresholds resolution-independent.
  */
 
+/**
+ * One advisory line. `code` is the stable identity of the problem and `message`
+ * is the sentence shown to the person — the wording is UI copy and changes with
+ * the interface language, so nothing outside the UI should ever match on it.
+ */
+export interface QualityAdvice {
+  code: 'DARK' | 'BRIGHT' | 'BLURRY';
+  message: string;
+}
+
 export interface QualityReport {
   brightness: number;
   sharpness: number;
   tooDark: boolean;
   tooBright: boolean;
   tooBlurry: boolean;
-  /** Short advisory sentences, empty when the photo looks fine. */
-  advice: string[];
+  /** Short advisory lines, empty when the photo looks fine. */
+  advice: QualityAdvice[];
 }
 
 export const QUALITY_THRESHOLDS = {
@@ -74,10 +84,25 @@ export function gradeQuality(brightness: number, sharpness: number): QualityRepo
   const tooBright = brightness > QUALITY_THRESHOLDS.brightAbove;
   const tooBlurry = sharpness < QUALITY_THRESHOLDS.blurryBelow;
 
-  const advice: string[] = [];
-  if (tooDark) advice.push('The photo looks dark. Use the flash or move to better light.');
-  if (tooBright) advice.push('The photo looks washed out. Avoid direct glare on the label.');
-  if (tooBlurry) advice.push('The photo looks blurred. Hold still and let the camera focus on the text.');
+  const advice: QualityAdvice[] = [];
+  if (tooDark) {
+    advice.push({
+      code: 'DARK',
+      message: 'Fotografia pare întunecată. Folosește blițul sau mută-te la o lumină mai bună.',
+    });
+  }
+  if (tooBright) {
+    advice.push({
+      code: 'BRIGHT',
+      message: 'Fotografia pare spălăcită. Evită reflexia directă a luminii pe etichetă.',
+    });
+  }
+  if (tooBlurry) {
+    advice.push({
+      code: 'BLURRY',
+      message: 'Fotografia pare neclară. Stai nemișcat și lasă camera foto să focalizeze pe text.',
+    });
+  }
 
   return { brightness, sharpness, tooDark, tooBright, tooBlurry, advice };
 }

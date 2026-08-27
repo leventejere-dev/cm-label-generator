@@ -1,7 +1,7 @@
 {
-  "name": "CM Label Generator",
-  "short_name": "CM Labels",
-  "description": "Scan a supplier material label and generate a standardized Color Metal A4 label.",
+  "name": "Generator Etichete CM",
+  "short_name": "Etichete CM",
+  "description": "Fotografiază eticheta de material a furnizorului și generează o etichetă Color Metal standardizată, în format A5.",
   "start_url": "./",
   "scope": "./",
   "display": "standalone",
@@ -9,6 +9,13 @@
   "background_color": "#FFFFFF",
   "theme_color": "#141C24",
   "icons": [
-    { "src": "./branding/favicon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" }
-  ]
+    {
+      "src": "./branding/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
+  ],
+  "lang": "ro",
+  "dir": "ltr"
 }

@@ -11,11 +11,11 @@ export const LABEL_STATUSES = ['draft', 'extracted', 'reviewed', 'generated', 'f
 export type LabelStatus = (typeof LABEL_STATUSES)[number];
 
 export const LABEL_STATUS_LABELS: Record<LabelStatus, string> = {
-  draft: 'Draft',
-  extracted: 'Extracted',
-  reviewed: 'Reviewed',
-  generated: 'Generated',
-  failed: 'Failed',
+  draft: 'Ciornă',
+  extracted: 'Extras',
+  reviewed: 'Verificat',
+  generated: 'Generat',
+  failed: 'Eșuat',
 };
 
 /**

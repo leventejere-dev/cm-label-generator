@@ -77,10 +77,10 @@ export function ReviewPage() {
   if (loaded.loading && !fromSession) {
     return (
       <div className="app-shell">
-        <AppBar title="Review" back="/" />
+        <AppBar title="Verificare" back="/" />
         <main className="app-main">
           <Card padded>
-            <span className="spinner" /> Loading label…
+            <span className="spinner" /> Se încarcă eticheta…
           </Card>
         </main>
       </div>
@@ -91,13 +91,13 @@ export function ReviewPage() {
     const error = loaded.error;
     return (
       <div className="app-shell">
-        <AppBar title="Review" back="/" />
+        <AppBar title="Verificare" back="/" />
         <main className="app-main stack">
-          <Banner tone="danger" title={error?.title ?? 'Label not available'}>
-            {error?.detail ?? 'This label could not be opened.'}
+          <Banner tone="danger" title={error?.title ?? 'Eticheta nu este disponibilă'}>
+            {error?.detail ?? 'Această etichetă nu a putut fi deschisă.'}
           </Banner>
           <Button variant="primary" onClick={() => navigate('/')}>
-            Back to start
+            Înapoi la început
           </Button>
         </main>
       </div>
@@ -139,13 +139,13 @@ export function ReviewPage() {
 
   return (
     <div className="app-shell">
-      <AppBar title="Review extracted information" back="/" />
+      <AppBar title="Verificare informații extrase" back="/" />
       <main className="app-main stack">
         <div>
-          <h1 className="page-title">Review extracted information</h1>
+          <h1 className="page-title">Verifică informațiile extrase</h1>
           <p className="page-subtitle">
-            Check the values against the photo. Everything is editable. Nothing is printed until you
-            generate the label.
+            Compară valorile cu fotografia. Poți modifica orice câmp. Nimic nu se tipărește până
+            când nu generezi eticheta.
           </p>
         </div>
 
@@ -156,7 +156,7 @@ export function ReviewPage() {
         ) : null}
 
         {blockingWarnings.length > 0 ? (
-          <Banner tone="warn" title="Please verify the highlighted fields before generating the label.">
+          <Banner tone="warn" title="Verifică câmpurile evidențiate înainte de a genera eticheta.">
             <ul style={{ margin: '4px 0 0', paddingLeft: 18 }}>
               {blockingWarnings.slice(0, 5).map((warning, index) => (
                 <li key={`${warning.code}-${index}`}>{warning.message}</li>
@@ -168,28 +168,28 @@ export function ReviewPage() {
         <div className="review-grid">
           <div className="review-source stack-sm">
             <div className="section-heading">
-              <h2>Source photo</h2>
+              <h2>Fotografia sursă</h2>
             </div>
             {imageUrl ? (
               <a href={imageUrl} target="_blank" rel="noreferrer">
-                <img className="review-source__img" src={imageUrl} alt="The photographed supplier label" />
+                <img className="review-source__img" src={imageUrl} alt="Eticheta furnizorului fotografiată" />
               </a>
             ) : (
               <Card padded>
                 <div style={{ display: 'flex', gap: 10, alignItems: 'center' }} className="muted">
                   <IconImage size={18} />
-                  The source photo is not available for this label.
+                  Fotografia sursă nu este disponibilă pentru această etichetă.
                 </div>
               </Card>
             )}
 
-            <Disclosure summary="Extraction details">
+            <Disclosure summary="Detalii despre extragere">
               <div className="kv">
-                <span className="kv__k">Color Metal ID</span>
+                <span className="kv__k">ID Color Metal</span>
                 <span className="kv__v mono">{record.cmId}</span>
               </div>
               <div className="kv">
-                <span className="kv__k">Provider</span>
+                <span className="kv__k">Serviciu AI</span>
                 <span className="kv__v">{record.aiProvider ?? '—'}</span>
               </div>
               <div className="kv">
@@ -197,13 +197,13 @@ export function ReviewPage() {
                 <span className="kv__v">{record.aiModel ?? '—'}</span>
               </div>
               <div className="kv">
-                <span className="kv__k">Processing time</span>
+                <span className="kv__k">Timp de procesare</span>
                 <span className="kv__v">
                   {record.processingDurationMs ? `${(record.processingDurationMs / 1000).toFixed(1)} s` : '—'}
                 </span>
               </div>
               <div className="kv">
-                <span className="kv__k">Overall confidence</span>
+                <span className="kv__k">Încredere generală</span>
                 <span className="kv__v">
                   {record.overallConfidence !== null
                     ? `${Math.round(record.overallConfidence * 100)}%`
@@ -211,7 +211,7 @@ export function ReviewPage() {
                 </span>
               </div>
               <div className="kv">
-                <span className="kv__k">Detected language</span>
+                <span className="kv__k">Limba detectată</span>
                 <span className="kv__v">{data.detectedLanguage ?? '—'}</span>
               </div>
             </Disclosure>
@@ -225,7 +225,7 @@ export function ReviewPage() {
 
         <div className="action-bar">
           <Button variant="ghost" onClick={() => navigate('/')}>
-            Cancel
+            Anulează
           </Button>
           <Button
             variant="primary"
@@ -233,7 +233,7 @@ export function ReviewPage() {
             loading={saving}
             onClick={() => void handleGenerate()}
           >
-            Generate CM Label
+            Generează eticheta CM
           </Button>
         </div>
       </main>

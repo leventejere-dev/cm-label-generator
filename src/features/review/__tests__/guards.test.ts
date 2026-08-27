@@ -24,7 +24,7 @@ describe('review form guards', () => {
     for (const caption of ['Supplier', 'Manufacturer', 'Hersteller', 'Furnizor', 'Website']) {
       const verdict = checkCaption(caption);
       expect(verdict.ok).toBe(false);
-      expect(verdict.message).toMatch(/supplier/i);
+      expect(verdict.message).toMatch(/furnizor/i);
     }
   });
 

@@ -30,37 +30,37 @@ export function PhotoPreview({ processed, quality, onRetake, onAnalyze, busy }: 
   return (
     <div className="stack">
       <div>
-        <h1 className="page-title">Check the photo</h1>
+        <h1 className="page-title">Verifică fotografia</h1>
         <p className="page-subtitle">
-          All four edges of the label should be visible and the small text readable.
+          Toate cele patru margini ale etichetei trebuie să se vadă, iar textul mic să fie lizibil.
         </p>
       </div>
 
       {hasAdvice ? (
-        <Banner tone="warn" title="This photo may be hard to read">
+        <Banner tone="warn" title="Fotografia poate fi greu de citit">
           <ul style={{ margin: '4px 0 0', paddingLeft: 18 }}>
             {quality?.advice.map((line) => (
-              <li key={line}>{line}</li>
+              <li key={line.code}>{line.message}</li>
             ))}
           </ul>
         </Banner>
       ) : null}
 
       <figure className="photo-preview">
-        <img src={processed.previewUrl} alt="The label you just photographed" />
+        <img src={processed.previewUrl} alt="Eticheta pe care tocmai ai fotografiat-o" />
       </figure>
 
       <p className="muted cm-tabular" style={{ fontSize: 'var(--cm-text-xs)' }}>
-        {processed.width} × {processed.height} px · {formatBytes(processed.bytes)} · optimised from{' '}
+        {processed.width} × {processed.height} px · {formatBytes(processed.bytes)} · optimizată de la{' '}
         {processed.sourceWidth} × {processed.sourceHeight} px
       </p>
 
       <div className="action-bar">
         <Button variant="secondary" icon={<IconCamera size={18} />} onClick={onRetake} disabled={busy}>
-          Retake photo
+          Refă fotografia
         </Button>
         <Button variant="primary" icon={<IconCheck size={18} />} onClick={onAnalyze} loading={busy}>
-          Analyze label
+          Analizează eticheta
         </Button>
       </div>
     </div>

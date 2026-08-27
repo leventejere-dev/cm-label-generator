@@ -17,7 +17,7 @@ export function AppBar({ title, back }: AppBarProps) {
         <button
           type="button"
           className="app-bar__back"
-          aria-label="Go back"
+          aria-label="Înapoi"
           onClick={() => (typeof back === 'string' ? navigate(back) : navigate(-1))}
         >
           <IconBack size={18} />

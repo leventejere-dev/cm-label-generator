@@ -14,8 +14,9 @@
  * supplier labels are not standardized and useful data must not be lost just
  * because it has an unusual caption.
  *
- * Romanian print captions are included because the finished label goes to
- * Color Metal's own customers in Romania; the app interface stays in English.
+ * The app interface is Romanian. The PRINTED label is bilingual: `printLabelRo`
+ * is the default, `printLabel` is the English variant kept for export customers.
+ * Do not translate `printLabel` — it is the only English caption source left.
  */
 
 export const FIELD_GROUPS = [
@@ -35,12 +36,13 @@ export interface FieldDescriptor {
   group: FieldGroupId;
   /** Stable machine key. Never translated, never renamed. */
   key: string;
-  /** Label shown in the review form (English). */
+  /** Caption shown in the review form (app interface — Romanian). */
   label: string;
-  /** Caption printed on the A4 label. */
+  /** Caption printed on the A4 label: English variant, for export customers. */
   printLabel: string;
+  /** Caption printed on the A4 label: Romanian variant, the default. */
   printLabelRo: string;
-  /** Short hint for the reviewer and for the AI prompt. */
+  /** Short hint shown to the reviewer as the input placeholder (Romanian). */
   hint?: string;
   /**
    * Filled in by the Color Metal employee, never by the extraction model —
@@ -61,7 +63,24 @@ export interface FieldDescriptor {
   omitFromLabel?: boolean;
 }
 
+/**
+ * Group headings shown in the REVIEW FORM (app interface — Romanian).
+ *
+ * These used to double as the English printed-label headings. They no longer
+ * do: the printed label reads GROUP_TITLES_PRINT_EN / GROUP_TITLES_RO through
+ * groupTitle(), so translating the app never changes what gets printed.
+ */
 export const GROUP_TITLES: Record<FieldGroupId, string> = {
+  delivery: 'Livrare',
+  product: 'Informații produs',
+  quantity: 'Cantitate / greutate',
+  traceability: 'Trasabilitate',
+  dates: 'Date',
+  commercial: 'Referințe comandă',
+};
+
+/** Printed-label group headings, English variant (export customers). */
+export const GROUP_TITLES_PRINT_EN: Record<FieldGroupId, string> = {
   delivery: 'Delivery',
   product: 'Product information',
   quantity: 'Quantity / weight',
@@ -70,6 +89,7 @@ export const GROUP_TITLES: Record<FieldGroupId, string> = {
   commercial: 'Order references',
 };
 
+/** Printed-label group headings, Romanian variant (the default). */
 export const GROUP_TITLES_RO: Record<FieldGroupId, string> = {
   delivery: 'Livrare',
   product: 'Informații produs',
@@ -81,64 +101,64 @@ export const GROUP_TITLES_RO: Record<FieldGroupId, string> = {
 
 /** Explanatory subtitle for the delivery group in the review form. */
 export const DELIVERY_GROUP_NOTE =
-  'Your own delivery details. These are not read from the supplier label — fill them in for the customer receiving this material.';
+  'Datele tale de livrare. Nu sunt citite de pe eticheta furnizorului — completează-le pentru clientul care primește acest material.';
 
 export const FIELD_CATALOGUE: readonly FieldDescriptor[] = [
   // --- delivery (entered by Color Metal, never extracted) -------------------
-  { group: 'delivery', key: 'clientName', label: 'Client', printLabel: 'Client', printLabelRo: 'Client', hint: 'The Color Metal customer receiving this material', humanOnly: true },
-  { group: 'delivery', key: 'clientAddress', label: 'Delivery address', printLabel: 'Delivery address', printLabelRo: 'Adresă livrare', hint: 'Where this pallet or bundle is going', humanOnly: true },
-  { group: 'delivery', key: 'clientOrder', label: 'Customer order', printLabel: 'Customer order', printLabelRo: 'Comandă client', hint: 'Your customer’s order or contract number', humanOnly: true },
+  { group: 'delivery', key: 'clientName', label: 'Client', printLabel: 'Client', printLabelRo: 'Client', hint: 'Clientul Color Metal care primește acest material', humanOnly: true },
+  { group: 'delivery', key: 'clientAddress', label: 'Adresă livrare', printLabel: 'Delivery address', printLabelRo: 'Adresă livrare', hint: 'Unde merge acest palet sau această legătură', humanOnly: true },
+  { group: 'delivery', key: 'clientOrder', label: 'Comandă client', printLabel: 'Customer order', printLabelRo: 'Comandă client', hint: 'Numărul de comandă sau de contract al clientului tău', humanOnly: true },
 
   // --- product --------------------------------------------------------------
-  { group: 'product', key: 'material', label: 'Material', printLabel: 'Material', printLabelRo: 'Material', hint: 'e.g. Aluminium, Copper, Stainless steel' },
-  { group: 'product', key: 'productType', label: 'Product type', printLabel: 'Product', printLabelRo: 'Produs', hint: 'e.g. Sheet, Coil, Bar, Angle / L-profile' },
-  { group: 'product', key: 'profileType', label: 'Profile type', printLabel: 'Profile', printLabelRo: 'Profil', hint: 'Profile designation if the product is an extrusion' },
-  { group: 'product', key: 'alloy', label: 'Alloy', printLabel: 'Alloy', printLabelRo: 'Aliaj', hint: 'e.g. EN AW-5754, EN AW-2024, 6060, CuZn37' },
-  { group: 'product', key: 'temper', label: 'Temper', printLabel: 'Temper', printLabelRo: 'Stare', hint: 'e.g. T6, T651, H111, O/H111' },
-  { group: 'product', key: 'standard', label: 'Standard / norm', printLabel: 'Standard', printLabelRo: 'Standard', hint: 'e.g. EN 573-3, EN 755-2' },
-  { group: 'product', key: 'finish', label: 'Finish', printLabel: 'Finish', printLabelRo: 'Finisaj', hint: 'e.g. Mill, Anodised, 2B' },
-  { group: 'product', key: 'surfaceTreatment', label: 'Surface / coating', printLabel: 'Surface', printLabelRo: 'Suprafață', hint: 'Coating, paint, film, RAL code' },
-  { group: 'product', key: 'dimensions', label: 'Dimensions', printLabel: 'Dimensions', printLabelRo: 'Dimensiuni', hint: 'Full dimensional string exactly as printed' },
-  { group: 'product', key: 'thickness', label: 'Thickness', printLabel: 'Thickness', printLabelRo: 'Grosime', hint: 'Keep the unit and the exact decimals' },
-  { group: 'product', key: 'width', label: 'Width', printLabel: 'Width', printLabelRo: 'Lățime' },
-  { group: 'product', key: 'length', label: 'Length', printLabel: 'Length', printLabelRo: 'Lungime' },
-  { group: 'product', key: 'diameter', label: 'Diameter', printLabel: 'Diameter', printLabelRo: 'Diametru' },
-  { group: 'product', key: 'wallThickness', label: 'Wall thickness', printLabel: 'Wall thk.', printLabelRo: 'Grosime perete' },
+  { group: 'product', key: 'material', label: 'Material', printLabel: 'Material', printLabelRo: 'Material', hint: 'ex.: aluminiu, cupru, oțel inox' },
+  { group: 'product', key: 'productType', label: 'Tip produs', printLabel: 'Product', printLabelRo: 'Produs', hint: 'ex.: tablă, rulou, bară, cornier / profil L' },
+  { group: 'product', key: 'profileType', label: 'Tip profil', printLabel: 'Profile', printLabelRo: 'Profil', hint: 'Denumirea profilului, dacă produsul este extrudat' },
+  { group: 'product', key: 'alloy', label: 'Aliaj', printLabel: 'Alloy', printLabelRo: 'Aliaj', hint: 'ex.: EN AW-5754, EN AW-2024, 6060, CuZn37' },
+  { group: 'product', key: 'temper', label: 'Stare', printLabel: 'Temper', printLabelRo: 'Stare', hint: 'ex.: T6, T651, H111, O/H111' },
+  { group: 'product', key: 'standard', label: 'Standard / normă', printLabel: 'Standard', printLabelRo: 'Standard', hint: 'ex.: EN 573-3, EN 755-2' },
+  { group: 'product', key: 'finish', label: 'Finisaj', printLabel: 'Finish', printLabelRo: 'Finisaj', hint: 'ex.: Mill, eloxat, 2B' },
+  { group: 'product', key: 'surfaceTreatment', label: 'Suprafață / acoperire', printLabel: 'Surface', printLabelRo: 'Suprafață', hint: 'Acoperire, vopsea, folie, cod RAL' },
+  { group: 'product', key: 'dimensions', label: 'Dimensiuni', printLabel: 'Dimensions', printLabelRo: 'Dimensiuni', hint: 'Șirul complet de dimensiuni, exact ca pe etichetă' },
+  { group: 'product', key: 'thickness', label: 'Grosime', printLabel: 'Thickness', printLabelRo: 'Grosime', hint: 'Păstrează unitatea de măsură și zecimalele exacte' },
+  { group: 'product', key: 'width', label: 'Lățime', printLabel: 'Width', printLabelRo: 'Lățime' },
+  { group: 'product', key: 'length', label: 'Lungime', printLabel: 'Length', printLabelRo: 'Lungime' },
+  { group: 'product', key: 'diameter', label: 'Diametru', printLabel: 'Diameter', printLabelRo: 'Diametru' },
+  { group: 'product', key: 'wallThickness', label: 'Grosime perete', printLabel: 'Wall thk.', printLabelRo: 'Grosime perete' },
 
   // --- quantity -------------------------------------------------------------
-  { group: 'quantity', key: 'pieces', label: 'Pieces', printLabel: 'Pieces', printLabelRo: 'Număr bucăți', hint: 'Number of pieces / bars / sheets' },
-  { group: 'quantity', key: 'quantity', label: 'Quantity', printLabel: 'Quantity', printLabelRo: 'Cantitate', hint: 'Quantity when it is not a piece count' },
-  { group: 'quantity', key: 'unit', label: 'Unit', printLabel: 'Unit', printLabelRo: 'UM', hint: 'e.g. pcs, kg, m, m²' },
-  { group: 'quantity', key: 'netWeight', label: 'Net weight', printLabel: 'Net weight', printLabelRo: 'Cantitate netă', hint: 'Never mix up with gross weight' },
-  { group: 'quantity', key: 'grossWeight', label: 'Gross weight', printLabel: 'Gross weight', printLabelRo: 'Cantitate brută' },
-  { group: 'quantity', key: 'tareWeight', label: 'Tare weight', printLabel: 'Tare weight', printLabelRo: 'Tara' },
-  { group: 'quantity', key: 'packages', label: 'Packages / bundles', printLabel: 'Packages', printLabelRo: 'Colete' },
+  { group: 'quantity', key: 'pieces', label: 'Bucăți', printLabel: 'Pieces', printLabelRo: 'Număr bucăți', hint: 'Număr de bucăți / bare / table' },
+  { group: 'quantity', key: 'quantity', label: 'Cantitate', printLabel: 'Quantity', printLabelRo: 'Cantitate', hint: 'Cantitatea, când nu se numără în bucăți' },
+  { group: 'quantity', key: 'unit', label: 'Unitate de măsură', printLabel: 'Unit', printLabelRo: 'UM', hint: 'ex.: buc, kg, m, m²' },
+  { group: 'quantity', key: 'netWeight', label: 'Greutate netă', printLabel: 'Net weight', printLabelRo: 'Cantitate netă', hint: 'Nu o confunda cu greutatea brută' },
+  { group: 'quantity', key: 'grossWeight', label: 'Greutate brută', printLabel: 'Gross weight', printLabelRo: 'Cantitate brută' },
+  { group: 'quantity', key: 'tareWeight', label: 'Tara', printLabel: 'Tare weight', printLabelRo: 'Tara' },
+  { group: 'quantity', key: 'packages', label: 'Colete / legături', printLabel: 'Packages', printLabelRo: 'Colete' },
 
   // --- traceability ---------------------------------------------------------
-  { group: 'traceability', key: 'lotNumber', label: 'Lot no.', printLabel: 'Lot', printLabelRo: 'Lot' },
-  { group: 'traceability', key: 'packageNumber', label: 'Package no.', printLabel: 'Package no.', printLabelRo: 'Număr pachet', hint: 'Bundle or package number on this unit' },
-  { group: 'traceability', key: 'castNumber', label: 'Cast no.', printLabel: 'Cast no.', printLabelRo: 'Șarjă' },
-  { group: 'traceability', key: 'heatNumber', label: 'Heat no.', printLabel: 'Heat no.', printLabelRo: 'Șarjă (heat)' },
-  { group: 'traceability', key: 'batchNumber', label: 'Batch no.', printLabel: 'Batch no.', printLabelRo: 'Lot fabricație' },
-  { group: 'traceability', key: 'coilNumber', label: 'Coil no.', printLabel: 'Coil no.', printLabelRo: 'Număr rulou' },
-  { group: 'traceability', key: 'palletNumber', label: 'Pallet no.', printLabel: 'Pallet no.', printLabelRo: 'Număr palet' },
-  { group: 'traceability', key: 'bundleNumber', label: 'Bundle no.', printLabel: 'Bundle no.', printLabelRo: 'Număr legătură' },
-  { group: 'traceability', key: 'serialNumber', label: 'Serial no.', printLabel: 'Serial no.', printLabelRo: 'Număr serie' },
-  { group: 'traceability', key: 'certificateNumber', label: 'Certificate no.', printLabel: 'Certificate no.', printLabelRo: 'Număr certificat' },
+  { group: 'traceability', key: 'lotNumber', label: 'Nr. lot', printLabel: 'Lot', printLabelRo: 'Lot' },
+  { group: 'traceability', key: 'packageNumber', label: 'Nr. pachet', printLabel: 'Package no.', printLabelRo: 'Număr pachet', hint: 'Numărul legăturii sau al pachetului de pe această unitate' },
+  { group: 'traceability', key: 'castNumber', label: 'Nr. șarjă', printLabel: 'Cast no.', printLabelRo: 'Șarjă' },
+  { group: 'traceability', key: 'heatNumber', label: 'Nr. șarjă (heat)', printLabel: 'Heat no.', printLabelRo: 'Șarjă (heat)' },
+  { group: 'traceability', key: 'batchNumber', label: 'Nr. lot fabricație', printLabel: 'Batch no.', printLabelRo: 'Lot fabricație' },
+  { group: 'traceability', key: 'coilNumber', label: 'Nr. rulou', printLabel: 'Coil no.', printLabelRo: 'Număr rulou' },
+  { group: 'traceability', key: 'palletNumber', label: 'Nr. palet', printLabel: 'Pallet no.', printLabelRo: 'Număr palet' },
+  { group: 'traceability', key: 'bundleNumber', label: 'Nr. legătură', printLabel: 'Bundle no.', printLabelRo: 'Număr legătură' },
+  { group: 'traceability', key: 'serialNumber', label: 'Nr. serie', printLabel: 'Serial no.', printLabelRo: 'Număr serie' },
+  { group: 'traceability', key: 'certificateNumber', label: 'Nr. certificat', printLabel: 'Certificate no.', printLabelRo: 'Număr certificat' },
 
   // --- dates ----------------------------------------------------------------
-  { group: 'dates', key: 'productionDate', label: 'Production date', printLabel: 'Production date', printLabelRo: 'Data producției' },
-  { group: 'dates', key: 'packingDate', label: 'Packing date', printLabel: 'Packing date', printLabelRo: 'Data împachetării' },
-  { group: 'dates', key: 'deliveryDate', label: 'Delivery date', printLabel: 'Delivery date', printLabelRo: 'Data livrării' },
+  { group: 'dates', key: 'productionDate', label: 'Data producției', printLabel: 'Production date', printLabelRo: 'Data producției' },
+  { group: 'dates', key: 'packingDate', label: 'Data împachetării', printLabel: 'Packing date', printLabelRo: 'Data împachetării' },
+  { group: 'dates', key: 'deliveryDate', label: 'Data livrării', printLabel: 'Delivery date', printLabelRo: 'Data livrării' },
 
   // --- commercial -----------------------------------------------------------
-  { group: 'commercial', key: 'customerPurchaseOrder', label: 'Purchase order', printLabel: 'Purchase order', printLabelRo: 'Comandă achiziție', hint: 'Color Metal purchase order number printed by the supplier', omitFromLabel: true },
-  { group: 'commercial', key: 'productionOrder', label: 'Production order / contract', printLabel: 'Production order', printLabelRo: 'Comandă producție', omitFromLabel: true },
-  { group: 'commercial', key: 'customerReference', label: 'Customer reference', printLabel: 'Customer ref.', printLabelRo: 'Referință client', omitFromLabel: true },
-  { group: 'commercial', key: 'deliveryNoteNumber', label: 'Delivery note no.', printLabel: 'Delivery note', printLabelRo: 'Aviz de însoțire', omitFromLabel: true },
-  { group: 'commercial', key: 'positionNumber', label: 'Position / item no.', printLabel: 'Position', printLabelRo: 'Poziție', omitFromLabel: true },
-  { group: 'commercial', key: 'customerName', label: 'Customer on supplier label', printLabel: 'Ordered by', printLabelRo: 'Comandat de', hint: 'Usually Color Metal itself — this is NOT the supplier', omitFromLabel: true },
-  { group: 'commercial', key: 'deliveryAddress', label: 'Ship-to on supplier label', printLabel: 'Received at', printLabelRo: 'Recepționat la', hint: 'Usually a Color Metal site', omitFromLabel: true },
+  { group: 'commercial', key: 'customerPurchaseOrder', label: 'Comandă achiziție', printLabel: 'Purchase order', printLabelRo: 'Comandă achiziție', hint: 'Numărul comenzii de achiziție Color Metal, tipărit de furnizor', omitFromLabel: true },
+  { group: 'commercial', key: 'productionOrder', label: 'Comandă producție / contract', printLabel: 'Production order', printLabelRo: 'Comandă producție', omitFromLabel: true },
+  { group: 'commercial', key: 'customerReference', label: 'Referință client', printLabel: 'Customer ref.', printLabelRo: 'Referință client', omitFromLabel: true },
+  { group: 'commercial', key: 'deliveryNoteNumber', label: 'Nr. aviz de însoțire', printLabel: 'Delivery note', printLabelRo: 'Aviz de însoțire', omitFromLabel: true },
+  { group: 'commercial', key: 'positionNumber', label: 'Poziție / nr. articol', printLabel: 'Position', printLabelRo: 'Poziție', omitFromLabel: true },
+  { group: 'commercial', key: 'customerName', label: 'Client pe eticheta furnizorului', printLabel: 'Ordered by', printLabelRo: 'Comandat de', hint: 'De obicei chiar Color Metal — NU este furnizorul', omitFromLabel: true },
+  { group: 'commercial', key: 'deliveryAddress', label: 'Adresă livrare pe eticheta furnizorului', printLabel: 'Received at', printLabelRo: 'Recepționat la', hint: 'De obicei un punct de lucru Color Metal', omitFromLabel: true },
 ] as const;
 
 const BY_KEY = new Map<string, FieldDescriptor>(FIELD_CATALOGUE.map((f) => [f.key, f]));
@@ -207,7 +227,7 @@ export function isGroupOmittedFromLabel(group: FieldGroupId): boolean {
 }
 
 export function groupTitle(group: FieldGroupId, language: LabelLanguage): string {
-  return language === 'ro' ? GROUP_TITLES_RO[group] : GROUP_TITLES[group];
+  return language === 'ro' ? GROUP_TITLES_RO[group] : GROUP_TITLES_PRINT_EN[group];
 }
 
 export function printCaption(field: FieldDescriptor, language: LabelLanguage): string {

@@ -296,7 +296,7 @@ function judge(caption: string, value: string, blocklist: SupplierBlocklist): Ve
     return {
       remove: true,
       category: 'supplier_name',
-      reason: 'The field caption names the supplier / manufacturer role.',
+      reason: 'Denumirea câmpului indică rolul de furnizor / producător.',
     };
   }
 
@@ -305,7 +305,7 @@ function judge(caption: string, value: string, blocklist: SupplierBlocklist): Ve
     return {
       remove: true,
       category: 'supplier_contact',
-      reason: 'Contact or branding information does not belong on a Color Metal label.',
+      reason: 'Datele de contact sau de brand nu au ce căuta pe o etichetă Color Metal.',
     };
   }
 
@@ -314,7 +314,7 @@ function judge(caption: string, value: string, blocklist: SupplierBlocklist): Ve
     return {
       remove: true,
       category: 'supplier_contact',
-      reason: 'The value looks like an e-mail address, website or telephone number.',
+      reason: 'Valoarea pare o adresă de e-mail, un site sau un număr de telefon.',
     };
   }
 
@@ -324,7 +324,7 @@ function judge(caption: string, value: string, blocklist: SupplierBlocklist): Ve
     return {
       remove: true,
       category: 'supplier_name',
-      reason: `The value contains "${hit}", which was identified as supplier information.`,
+      reason: `Valoarea conține „${hit}”, care a fost identificată ca informație despre furnizor.`,
     };
   }
 
@@ -405,14 +405,14 @@ export function colorMetalize(input: ExtractionResult): SanitizeOutcome {
     warnings.push({
       code: 'SOURCE_CODES_NOT_COPIED',
       severity: 'info',
-      message: `The supplier label contains ${describeCodes(safe.codes.qrCodes, safe.codes.barcodes)}. They are deliberately not reproduced — they may encode supplier data.`,
+      message: `Eticheta furnizorului conține ${describeCodes(safe.codes.qrCodes, safe.codes.barcodes)}. Nu sunt reproduse intenționat — pot conține date despre furnizor.`,
     });
   }
   if (removed.length > 0) {
     warnings.push({
       code: 'SUPPLIER_INFORMATION_REMOVED',
       severity: 'info',
-      message: `${removed.length} item${removed.length === 1 ? '' : 's'} of supplier information were excluded from the Color Metal label.`,
+      message: `${removed.length === 1 ? 'O informație despre furnizor a fost eliminată' : `${removed.length} informații despre furnizor au fost eliminate`} de pe eticheta Color Metal.`,
     });
   }
 
@@ -421,26 +421,26 @@ export function colorMetalize(input: ExtractionResult): SanitizeOutcome {
 
 function describeCodes(qr: number, barcodes: number): string {
   const parts: string[] = [];
-  if (qr > 0) parts.push(`${qr} QR code${qr === 1 ? '' : 's'}`);
-  if (barcodes > 0) parts.push(`${barcodes} barcode${barcodes === 1 ? '' : 's'}`);
-  return parts.join(' and ');
+  if (qr > 0) parts.push(`${qr} ${qr === 1 ? 'cod QR' : 'coduri QR'}`);
+  if (barcodes > 0) parts.push(`${barcodes} ${barcodes === 1 ? 'cod de bare' : 'coduri de bare'}`);
+  return parts.join(' și ');
 }
 
 export function categoryLabel(category: SensitiveCategory): string {
   const labels: Record<SensitiveCategory, string> = {
-    supplier_name: 'Supplier name',
-    supplier_logo: 'Supplier logo',
-    supplier_address: 'Supplier address',
-    supplier_contact: 'Supplier contact',
-    supplier_website: 'Supplier website',
-    supplier_email: 'Supplier e-mail',
-    supplier_phone: 'Supplier telephone',
-    supplier_branding: 'Supplier branding',
-    supplier_reference: 'Supplier reference',
-    supplier_marketing: 'Supplier marketing text',
-    other: 'Supplier information',
+    supplier_name: 'Nume furnizor',
+    supplier_logo: 'Logo furnizor',
+    supplier_address: 'Adresă furnizor',
+    supplier_contact: 'Contact furnizor',
+    supplier_website: 'Site furnizor',
+    supplier_email: 'E-mail furnizor',
+    supplier_phone: 'Telefon furnizor',
+    supplier_branding: 'Brand furnizor',
+    supplier_reference: 'Referință furnizor',
+    supplier_marketing: 'Text de marketing al furnizorului',
+    other: 'Informații despre furnizor',
   };
-  return labels[category] ?? 'Supplier information';
+  return labels[category] ?? 'Informații despre furnizor';
 }
 
 /**

@@ -25,13 +25,13 @@ const OK: GuardVerdict = { ok: true };
 
 export function checkCaption(caption: string): GuardVerdict {
   const trimmed = caption.trim();
-  if (!trimmed) return { ok: false, message: 'Give the field a name.' };
-  if (trimmed.length > 60) return { ok: false, message: 'Keep the field name under 60 characters.' };
+  if (!trimmed) return { ok: false, message: 'Dă un nume câmpului.' };
+  if (trimmed.length > 60) return { ok: false, message: 'Numele câmpului trebuie să aibă sub 60 de caractere.' };
   if (isSupplierIdentifyingCaption(trimmed)) {
     return {
       ok: false,
       message:
-        'This field name would identify the supplier, so it cannot appear on a Color Metal label. Use a neutral name for product data instead.',
+        'Acest nume de câmp ar identifica furnizorul, așa că nu poate apărea pe o etichetă Color Metal. Folosește un nume neutru, pentru datele produsului.',
     };
   }
   return OK;
@@ -40,14 +40,14 @@ export function checkCaption(caption: string): GuardVerdict {
 export function checkValue(value: string, removed: RemovedItem[]): GuardVerdict {
   const trimmed = value.trim();
   if (!trimmed) return OK;
-  if (trimmed.length > 300) return { ok: false, message: 'This value is too long for a label field.' };
+  if (trimmed.length > 300) return { ok: false, message: 'Valoarea este prea lungă pentru un câmp de etichetă.' };
   if (isColorMetal(trimmed)) return OK;
 
   if (looksLikeContactDetail(trimmed)) {
     return {
       ok: false,
       message:
-        'E-mail addresses, websites and telephone numbers are not printed on Color Metal labels.',
+        'Adresele de e-mail, site-urile și numerele de telefon nu se tipăresc pe etichetele Color Metal.',
     };
   }
 
@@ -65,7 +65,7 @@ export function checkValue(value: string, removed: RemovedItem[]): GuardVerdict 
     return {
       ok: false,
       message:
-        'This value repeats information that was removed because it identifies the supplier. It cannot be printed on the Color Metal label.',
+        'Această valoare repetă o informație eliminată pentru că identifică furnizorul. Nu poate fi tipărită pe eticheta Color Metal.',
     };
   }
   return OK;

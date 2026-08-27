@@ -15,17 +15,17 @@ const BAND_TONE: Record<ConfidenceBand, BadgeTone> = {
 };
 
 const BAND_LABEL: Record<ConfidenceBand, string> = {
-  high: 'High confidence',
-  medium: 'Check this',
-  low: 'Verify',
-  unknown: 'Not scored',
+  high: 'Încredere mare',
+  medium: 'De verificat',
+  low: 'De confirmat',
+  unknown: 'Fără evaluare',
 };
 
 export function ConfidenceBadge({ confidence }: { confidence: number | null | undefined }) {
   const band = confidenceBand(confidence);
   const percent = confidence === null || confidence === undefined ? null : Math.round(confidence * 100);
   return (
-    <span className={`badge badge--${BAND_TONE[band]}`} title={percent === null ? 'No confidence reported' : `Model confidence ${percent}%`}>
+    <span className={`badge badge--${BAND_TONE[band]}`} title={percent === null ? 'Modelul nu a raportat nicio încredere' : `Încrederea modelului ${percent}%`}>
       <span className="badge__dot" />
       {BAND_LABEL[band]}
       {percent !== null ? ` ${percent}%` : ''}

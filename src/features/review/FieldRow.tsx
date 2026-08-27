@@ -52,7 +52,7 @@ export function FieldRow({
               maxWidth: 200,
             }}
             value={label}
-            aria-label="Field name"
+            aria-label="Numele câmpului"
             onChange={(event) => onChangeLabel(event.target.value)}
           />
         ) : (
@@ -63,14 +63,14 @@ export function FieldRow({
 
         <div className="field__actions">
           {edited ? (
-            <Badge tone="accent">Edited</Badge>
+            <Badge tone="accent">Modificat</Badge>
           ) : field ? (
             <ConfidenceBadge confidence={confidence} />
           ) : (
-            <Badge tone="neutral">Empty</Badge>
+            <Badge tone="neutral">Gol</Badge>
           )}
           {onRemove ? (
-            <button type="button" className="icon-btn" onClick={onRemove} aria-label={`Remove ${label}`}>
+            <button type="button" className="icon-btn" onClick={onRemove} aria-label={`Elimină ${label}`}>
               <IconTrash size={15} />
             </button>
           ) : null}
@@ -81,7 +81,7 @@ export function FieldRow({
         id={id}
         className="field__input"
         value={field?.value ?? ''}
-        placeholder={hint ?? 'Not on the label'}
+        placeholder={hint ?? 'Nu apare pe etichetă'}
         inputMode="text"
         autoComplete="off"
         autoCapitalize="off"
@@ -105,9 +105,9 @@ export function FieldRow({
             style={{ minHeight: 28, padding: '0 6px', marginTop: 4, fontSize: 'var(--cm-text-xs)' }}
             onClick={() => setShowSource((value) => !value)}
           >
-            {showSource ? 'Hide source text' : 'Show source text'}
+            {showSource ? 'Ascunde textul sursă' : 'Arată textul sursă'}
           </button>
-          {showSource ? <p className="field__source">“{field.sourceText}”</p> : null}
+          {showSource ? <p className="field__source">„{field.sourceText}”</p> : null}
         </>
       ) : null}
     </div>
