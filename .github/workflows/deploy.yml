@@ -54,7 +54,7 @@ jobs:
           VITE_CM_COMPANY_LINE: ${{ vars.VITE_CM_COMPANY_LINE || 'SC COLOR-METAL SRL' }}
           VITE_IMAGE_MAX_EDGE: ${{ vars.VITE_IMAGE_MAX_EDGE }}
           VITE_IMAGE_TARGET_BYTES: ${{ vars.VITE_IMAGE_TARGET_BYTES }}
-          VITE_APP_VERSION: ${{ github.sha }}
+          VITE_APP_VERSION: 1.0.${{ github.run_number }}
         run: npm run build
 
       - name: Upload Pages artifact
