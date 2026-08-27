@@ -44,11 +44,16 @@ jobs:
           VITE_SUPABASE_URL: ${{ vars.VITE_SUPABASE_URL }}
           VITE_SUPABASE_ANON_KEY: ${{ vars.VITE_SUPABASE_ANON_KEY }}
           VITE_MOCK_MODE: ${{ vars.VITE_MOCK_MODE || 'auto' }}
+          # Storage target. 'local' keeps every label on the device and
+          # uploads nothing; 'supabase' uses Postgres + the Storage bucket.
+          VITE_PERSISTENCE: ${{ vars.VITE_PERSISTENCE || 'auto' }}
           VITE_EXTRACT_FUNCTION_NAME: ${{ vars.VITE_EXTRACT_FUNCTION_NAME || 'extract-label' }}
           VITE_SOURCE_IMAGE_BUCKET: ${{ vars.VITE_SOURCE_IMAGE_BUCKET || 'label-sources' }}
           VITE_RETAIN_SOURCE_IMAGE: ${{ vars.VITE_RETAIN_SOURCE_IMAGE || 'true' }}
           VITE_CM_LOGO_URL: ${{ vars.VITE_CM_LOGO_URL }}
           VITE_CM_COMPANY_LINE: ${{ vars.VITE_CM_COMPANY_LINE || 'SC COLOR-METAL SRL' }}
+          VITE_IMAGE_MAX_EDGE: ${{ vars.VITE_IMAGE_MAX_EDGE }}
+          VITE_IMAGE_TARGET_BYTES: ${{ vars.VITE_IMAGE_TARGET_BYTES }}
           VITE_APP_VERSION: ${{ github.sha }}
         run: npm run build
 
