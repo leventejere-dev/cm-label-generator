@@ -136,9 +136,9 @@ function mapFailure(failure: EdgeFailure | null | undefined) {
       return appError('NO_LABEL_DETECTED');
     case 'PROVIDER_NOT_CONFIGURED':
       return appError('NOT_CONFIGURED', {
-        title: 'The analysis service is not configured',
+        title: 'Label reading is not switched on yet',
         detail:
-          'No AI provider key is set on the server. Add it with `supabase secrets set` (see README §9), or switch on mock mode.',
+          'The app is installed and working, but the image-reading service still has to be activated by whoever administers it. Nothing you did is wrong — please pass this message on and try again afterwards.',
       });
     default:
       return appError('AI_PROVIDER_ERROR', {
