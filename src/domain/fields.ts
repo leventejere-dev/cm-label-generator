@@ -47,6 +47,18 @@ export interface FieldDescriptor {
    * these describe OUR delivery, not the supplier's label.
    */
   humanOnly?: boolean;
+  /**
+   * Kept and shown internally, but never printed on the customer-facing label.
+   *
+   * The whole `commercial` group is marked this way: a purchase order, a
+   * supplier production order or a goods-receipt address are artefacts of how
+   * Color Metal BOUGHT the material. They are not supplier-identifying by
+   * themselves, but they make it obvious that the sheet was derived from a
+   * purchase document — so they stay off the label the customer sees.
+   *
+   * To print one of them anyway, delete `omitFromLabel: true` from that line.
+   */
+  omitFromLabel?: boolean;
 }
 
 export const GROUP_TITLES: Record<FieldGroupId, string> = {
@@ -120,13 +132,13 @@ export const FIELD_CATALOGUE: readonly FieldDescriptor[] = [
   { group: 'dates', key: 'deliveryDate', label: 'Delivery date', printLabel: 'Delivery date', printLabelRo: 'Data livrării' },
 
   // --- commercial -----------------------------------------------------------
-  { group: 'commercial', key: 'customerPurchaseOrder', label: 'Purchase order', printLabel: 'Purchase order', printLabelRo: 'Comandă achiziție', hint: 'Color Metal purchase order number printed by the supplier' },
-  { group: 'commercial', key: 'productionOrder', label: 'Production order / contract', printLabel: 'Production order', printLabelRo: 'Comandă producție' },
-  { group: 'commercial', key: 'customerReference', label: 'Customer reference', printLabel: 'Customer ref.', printLabelRo: 'Referință client' },
-  { group: 'commercial', key: 'deliveryNoteNumber', label: 'Delivery note no.', printLabel: 'Delivery note', printLabelRo: 'Aviz de însoțire' },
-  { group: 'commercial', key: 'positionNumber', label: 'Position / item no.', printLabel: 'Position', printLabelRo: 'Poziție' },
-  { group: 'commercial', key: 'customerName', label: 'Customer on supplier label', printLabel: 'Ordered by', printLabelRo: 'Comandat de', hint: 'Usually Color Metal itself — this is NOT the supplier' },
-  { group: 'commercial', key: 'deliveryAddress', label: 'Ship-to on supplier label', printLabel: 'Received at', printLabelRo: 'Recepționat la', hint: 'Usually a Color Metal site' },
+  { group: 'commercial', key: 'customerPurchaseOrder', label: 'Purchase order', printLabel: 'Purchase order', printLabelRo: 'Comandă achiziție', hint: 'Color Metal purchase order number printed by the supplier', omitFromLabel: true },
+  { group: 'commercial', key: 'productionOrder', label: 'Production order / contract', printLabel: 'Production order', printLabelRo: 'Comandă producție', omitFromLabel: true },
+  { group: 'commercial', key: 'customerReference', label: 'Customer reference', printLabel: 'Customer ref.', printLabelRo: 'Referință client', omitFromLabel: true },
+  { group: 'commercial', key: 'deliveryNoteNumber', label: 'Delivery note no.', printLabel: 'Delivery note', printLabelRo: 'Aviz de însoțire', omitFromLabel: true },
+  { group: 'commercial', key: 'positionNumber', label: 'Position / item no.', printLabel: 'Position', printLabelRo: 'Poziție', omitFromLabel: true },
+  { group: 'commercial', key: 'customerName', label: 'Customer on supplier label', printLabel: 'Ordered by', printLabelRo: 'Comandat de', hint: 'Usually Color Metal itself — this is NOT the supplier', omitFromLabel: true },
+  { group: 'commercial', key: 'deliveryAddress', label: 'Ship-to on supplier label', printLabel: 'Received at', printLabelRo: 'Recepționat la', hint: 'Usually a Color Metal site', omitFromLabel: true },
 ] as const;
 
 const BY_KEY = new Map<string, FieldDescriptor>(FIELD_CATALOGUE.map((f) => [f.key, f]));
@@ -149,6 +161,49 @@ export function fieldKeysInGroup(group: FieldGroupId): string[] {
 /** Fields the extraction model is asked about (everything except our own data). */
 export function extractableFields(): FieldDescriptor[] {
   return FIELD_CATALOGUE.filter((field) => !field.humanOnly);
+}
+
+/**
+ * Ad-hoc field captions that name an identifier in the SUPPLIER's own numbering
+ * scheme rather than a physical property of the material: article numbers,
+ * product/material codes, ERP references, order references.
+ *
+ * These are kept in the record and shown on the review screen, but not printed:
+ * a string like "500-0830/6060/T6/50/50/2/0/Mill-" is instantly recognisable as
+ * one supplier's article code, and everything it encodes (alloy, temper,
+ * dimensions, finish) is already printed as its own field.
+ *
+ * Physical properties with unusual captions — "Innendurchmesser", "Imballo" —
+ * are NOT matched and still print.
+ */
+const SUPPLIER_CODE_CAPTIONS: RegExp[] = [
+  /\bproduct\s*(code|no\.?|number)\b/i,
+  /\bitem\s*(code|no\.?|number)\b/i,
+  /\bmaterial\s*(code|no\.?|number)\b/i,
+  /\barticle\b/i,
+  /\bart\.?\s*(no\.?|nr\.?|code)\b/i,
+  /\bsku\b/i,
+  /\bsap\b/i,
+  /\berp\b/i,
+  /\border\b/i,
+  /\bartikel/i,
+  /\bcodice\b/i,
+  /\bcod\.?\s*(produs|articol|material)\b/i,
+  /\bcikksz[aá]m/i,
+  /\breferen[cz]/i,
+];
+
+/** Should this ad-hoc field stay off the customer-facing label? */
+export function isSupplierCodeCaption(caption: string): boolean {
+  const text = caption.trim();
+  if (!text) return false;
+  return SUPPLIER_CODE_CAPTIONS.some((re) => re.test(text));
+}
+
+/** Groups where every field is withheld from the printed label. */
+export function isGroupOmittedFromLabel(group: FieldGroupId): boolean {
+  const fields = fieldsInGroup(group);
+  return fields.length > 0 && fields.every((field) => field.omitFromLabel === true);
 }
 
 export function groupTitle(group: FieldGroupId, language: LabelLanguage): string {

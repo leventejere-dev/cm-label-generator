@@ -1,14 +1,14 @@
 /* ---------------------------------------------------------------------------
    PRINT
-   Target: 210 × 297 mm on an ordinary office laser printer.
-   The application chrome disappears; the A4 sheet becomes the whole page.
+   Target: A5, 148 × 210 mm, on an ordinary office laser printer.
+   The application chrome disappears; the label sheet becomes the whole page.
    --------------------------------------------------------------------------- */
 
 @page {
-  size: A4 portrait;
-  /* The sheet carries its own 12 mm margin, so the page margin is zero.
+  size: A5 portrait;
+  /* The sheet carries its own 8 mm margin, so the page margin is zero.
      If your printer refuses to print that close to the edge, change this to
-     `margin: 5mm` and reduce .a4-sheet padding by the same amount. */
+     `margin: 5mm` and reduce .sheet padding by the same amount. */
   margin: 0;
 }
 
@@ -18,7 +18,7 @@
     background: #fff !important;
     margin: 0 !important;
     padding: 0 !important;
-    width: 210mm;
+    width: 148mm;
   }
 
   /* Anything the operator interacts with is not part of the document. */
@@ -47,29 +47,29 @@
   }
 
   /* Undo the preview scaling — print at true size. */
-  .a4-viewport {
+  .sheet-viewport {
     height: auto !important;
     overflow: visible !important;
   }
 
-  .a4-scaler {
+  .sheet-scaler {
     transform: none !important;
-    width: 210mm !important;
+    width: 148mm !important;
   }
 
-  .a4-sheet {
+  .sheet {
     box-shadow: none !important;
     border: none !important;
-    width: 210mm !important;
-    height: 297mm !important;
+    width: 148mm !important;
+    height: 210mm !important;
     page-break-after: avoid;
     page-break-inside: avoid;
     break-inside: avoid;
   }
 
   /* Keep tinted section headers and rules visible on paper. */
-  .a4-sheet,
-  .a4-sheet * {
+  .sheet,
+  .sheet * {
     -webkit-print-color-adjust: exact;
     print-color-adjust: exact;
   }

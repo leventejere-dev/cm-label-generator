@@ -1,12 +1,12 @@
 # CM Label Generator
 
 Photograph a supplier's material label with your phone. Get back a clean, standardized
-**Color Metal A4 label** that keeps the product data and removes everything identifying
-the supplier.
+**Color Metal A5 label** (148 × 210 mm — half an A4 sheet) that keeps the product data and
+removes every trace of where the material was bought.
 
 ```
 SUPPLIER LABEL → CAMERA → AI UNDERSTANDING → STRUCTURED DATA
-              → HUMAN VERIFICATION → COLOR METAL LABEL → A4 PRINT / PDF
+              → HUMAN VERIFICATION → COLOR METAL LABEL → A5 PRINT / PDF
 ```
 
 ---
@@ -28,7 +28,7 @@ This tool removes that problem without anyone retyping a label:
    QR/barcodes) is separated out and **never** reaches the printed label.
 5. The employee reviews and corrects every value on screen, with low-confidence fields
    highlighted and the original photo beside them.
-6. A professional Color Metal A4 label is generated, printed or exported as PDF, and
+6. A professional Color Metal A5 label is generated, printed or exported as PDF, and
    saved to history.
 
 ### Design rules that are not negotiable
@@ -41,6 +41,9 @@ This tool removes that problem without anyone retyping a label:
 | Units are never invented — `690` never becomes `690 kg` | the AI prompt, warning `UNIT_NOT_PRINTED` |
 | Color Metal is the **customer** on these labels, never the supplier | `isColorMetal()`, prompt §3 |
 | Supplier QR/barcodes are detected but never reproduced | `codes` in the schema; nothing renders them |
+| The sheet carries no generator credit, no template version and no note about the original label | `domain/labelDocument.ts` |
+| Procurement references (purchase order, supplier production order, goods-receipt address) never print | `omitFromLabel` in `domain/fields.ts` |
+| The supplier's own article/product code never prints | `isSupplierCodeCaption()` in `domain/fields.ts` |
 | The AI key never touches the browser | Supabase Edge Function |
 
 ---
@@ -51,14 +54,14 @@ This tool removes that problem without anyone retyping a label:
 ┌─────────────────────────────── Phone / desktop browser ───────────────────────────────┐
 │  React 18 + TypeScript + Vite  (static files — GitHub Pages, HashRouter)               │
 │                                                                                       │
-│  camera ──► image optimisation ──► repository ──► review UI ──► A4 renderer            │
+│  camera ──► image optimisation ──► repository ──► review UI ──► A5 renderer            │
 │  getUserMedia   resize/compress     Supabase        editable      HTML print + pdf-lib │
 │                 quality checks      or localStorage  + guards      vector PDF          │
 └───────────────────────────────────────┬───────────────────────────────────────────────┘
                     anon key (public)   │   photo → private bucket
                                         ▼
 ┌──────────────────────────────────── Supabase ─────────────────────────────────────────┐
-│  Postgres  public.labels (JSONB) · next_cm_id() · RLS                                  │
+│  Postgres  public.labels (JSONB) · next_cm_id() · RLS   (optional — see §6)            │
 │  Storage   label-sources (private, signed URLs only)                                   │
 │  Edge Fn   extract-label  ── holds the AI key ── validates ── rate limits              │
 └───────────────────────────────────────┬───────────────────────────────────────────────┘
@@ -103,7 +106,7 @@ cm-label-generator/
 │   │   ├── fields.ts               THE FIELD CATALOGUE — one list drives everything
 │   │   ├── extraction.ts           tolerant Zod schema + normaliser
 │   │   ├── sanitize.ts             "Color Metalization" — supplier suppression
-│   │   ├── labelDocument.ts        the printable document model (RO / EN)
+│   │   ├── labelDocument.ts        the printable A5 document model (RO / EN)
 │   │   ├── labelRecord.ts          the persisted record
 │   │   └── cmId.ts                 CM-YYYYMMDD-XXXX
 │   │
@@ -118,7 +121,7 @@ cm-label-generator/
 │   │   ├── extraction/             provider.ts · edgeFunctionProvider · mockProvider
 │   │   │                           fixtures.ts · pipeline.ts · ProcessingView.tsx
 │   │   ├── review/                 ReviewForm · FieldRow · RemovedPanel · guards
-│   │   ├── label/                  A4Label.tsx · pdfExport.ts
+│   │   ├── label/                  LabelSheet.tsx · pdfExport.ts
 │   │   └── history/                RecentLabels.tsx
 │   │
 │   ├── routes/                     Home · Scan · Review · Label · History
@@ -195,7 +198,14 @@ They create:
 * **row level security** on every table (see §11)
 * the private `label-sources` storage bucket and its object policies
 
-### 5.2 Storage
+### 5.2 Storage (optional)
+
+If you set `VITE_PERSISTENCE=local`, skip this section and §5.1 entirely — the only
+Supabase piece you need is the Edge Function in §5.3, which exists purely so the AI key
+never reaches the browser. Labels then live in the phone's own storage and nothing about
+a delivery leaves the device except the single extraction call.
+
+
 
 The migration creates the bucket for you: **private**, 8 MB limit, JPEG/PNG/WebP only.
 The app never builds public URLs — it requests a 10-minute signed URL when it needs to
@@ -263,6 +273,7 @@ Every variable is documented in `.env.example`. The ones that matter:
 |---|---|---|
 | `VITE_SUPABASE_URL` / `VITE_SUPABASE_ANON_KEY` | empty | public Supabase credentials |
 | `VITE_MOCK_MODE` | `auto` | `auto` = mock while Supabase is unset; `true`/`false` force it |
+| `VITE_PERSISTENCE` | `auto` | `local` keeps every label on the device and uploads nothing |
 | `VITE_IMAGE_MAX_EDGE` | `2200` | longest edge after downscaling — don't go below ~1600 |
 | `VITE_IMAGE_TARGET_BYTES` | `2200000` | upload budget; JPEG quality steps down to reach it |
 | `VITE_RETAIN_SOURCE_IMAGE` | `true` | keep the photograph in Storage |
@@ -385,10 +396,11 @@ printed A4 sheet into `./verification`.
 
 ## 10. Printing and PDF
 
-* **Print label** — `window.print()` with real print CSS: `@page { size: A4; margin: 0 }`,
-  the sheet fixed at 210 × 297 mm, all application chrome removed. Choosing "Save as PDF"
-  in the print dialog gives a crisp, fully Unicode-correct PDF.
-* **Export PDF** — builds a genuine **vector** PDF with `pdf-lib`: real selectable text,
+* **Print label** — `window.print()` with real print CSS: `@page { size: A5; margin: 0 }`,
+  the sheet fixed at 148 × 210 mm, all application chrome removed. Choosing "Save as PDF"
+  in the print dialog gives a crisp, fully Unicode-correct PDF. If your printer only holds
+  A4, print two labels per sheet or let the printer centre a single A5.
+* **Export PDF** — builds a genuine **vector** A5 PDF with `pdf-lib`: real selectable text,
   no screenshot, no rasterisation. It shares the same `LabelDocument` model as the HTML
   renderer, so the two can never describe different labels. pdf-lib loads only when this
   button is pressed, keeping the scan flow light on mobile.
@@ -450,7 +462,7 @@ npm test
 |---|---|
 | `domain/__tests__/sanitize.test.ts` | supplier-caption detection in 12 languages; Color Metal preserved as the customer; the `Mill` finish surviving the "mill name" rule; **the `Acciai Speciali` vs `Acciaio inox` false positive** that would silently delete product data; contact-detail removal; input never mutated |
 | `domain/__tests__/extraction.test.ts` | all three fixtures; units never invented; decimal commas preserved; JSON numbers coerced *with a warning*; unknown keys harvested instead of dropped; snake_case aliases; garbage input degrading instead of throwing |
-| `domain/__tests__/labelDocument.test.ts` | empty fields and empty sections never emitted; delivery block; RO/EN captions; the render guard catching a simulated leak; composed dimensions; history summaries |
+| `domain/__tests__/labelDocument.test.ts` | empty fields and empty sections never emitted; delivery block; RO/EN captions; the render guard catching a simulated leak; **procurement references, the supplier's article code, the generator credit and the "codes not reproduced" note all kept off the sheet**; composed dimensions; history summaries |
 | `domain/__tests__/cmId.test.ts` | format, ambiguous characters excluded, uniqueness, parsing, coercion |
 | `features/review/__tests__/guards.test.ts` | the review form refusing to re-introduce supplier branding |
 | `lib/image/__tests__/preprocess.test.ts` | downscaling geometry, crop clamping, dark/blurred/washed-out detection |

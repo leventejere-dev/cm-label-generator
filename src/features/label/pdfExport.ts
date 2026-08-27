@@ -1,23 +1,26 @@
 /**
- * VECTOR PDF EXPORT
+ * VECTOR PDF EXPORT — A5 (148 × 210 mm)
  * ---------------------------------------------------------------------------
- * Builds a real A4 PDF with pdf-lib: selectable, searchable, crisp text — not a
+ * Builds a real PDF with pdf-lib: selectable, searchable, crisp text — not a
  * screenshot of the DOM. It consumes the same LabelDocument as the HTML
  * renderer, so the two can never describe different labels.
  *
+ * Point sizes mirror src/styles/label.css. If you change one, change both.
+ *
  * Known limitation: the standard PDF fonts use WinAnsi encoding, which has no
- * ă/ș/ț/ő/ű or Cyrillic. Those characters are transliterated (and noted in the
- * README). For a byte-perfect Unicode PDF use Print → "Save as PDF", which goes
- * through the browser's own renderer.
+ * ă/ș/ț/ő/ű or Cyrillic. Those characters are transliterated. For a
+ * byte-perfect Unicode PDF use Print → "Save as PDF", which goes through the
+ * browser's own renderer.
  */
 
-import { PDFDocument, StandardFonts, rgb, type PDFFont, type PDFPage, type PDFImage } from 'pdf-lib';
+import { PDFDocument, StandardFonts, rgb, type PDFFont, type PDFImage, type PDFPage } from 'pdf-lib';
 import { company, hexToRgb01, logoUrl, palette } from '../../branding/brand';
 import type { LabelDocument, LabelSection } from '../../domain/labelDocument';
 
-const A4 = { width: 595.28, height: 841.89 };
-const MARGIN = 34; // 12 mm
-const GUTTER = 17;
+/** A5 in PostScript points. */
+const PAGE = { width: 419.53, height: 595.28 };
+const MARGIN = 22.7; // 8 mm
+const GUTTER = 12.8; // 4.5 mm
 
 const INK = hexToRgb01(palette.ink);
 const MUTED = hexToRgb01(palette.inkMuted);
@@ -40,7 +43,7 @@ const TRANSLITERATION: Record<string, string> = {
   ź: 'z', Ź: 'Z', ż: 'z', Ż: 'Z', ě: 'e', Ě: 'E', ř: 'r', Ř: 'R',
   ů: 'u', Ů: 'U', ť: 't', Ť: 'T', ď: 'd', Ď: 'D', ň: 'n', Ň: 'N',
   '–': '-', '—': '-', '×': 'x', '’': "'", '‘': "'", '“': '"', '”': '"', '…': '...',
-  ' ': ' ',
+  ' ': ' ',
 };
 
 export function toWinAnsi(input: string): string {
@@ -71,7 +74,6 @@ function wrapText(text: string, font: PDFFont, size: number, maxWidth: number): 
       continue;
     }
     if (current) lines.push(current);
-    // A single word longer than the column: hard-break it.
     if (font.widthOfTextAtSize(word, size) > maxWidth) {
       let chunk = '';
       for (const char of word) {
@@ -94,7 +96,6 @@ function wrapText(text: string, font: PDFFont, size: number, maxWidth: number): 
 interface Fonts {
   regular: PDFFont;
   bold: PDFFont;
-  mono: PDFFont;
   monoBold: PDFFont;
 }
 
@@ -114,39 +115,37 @@ async function loadLogo(pdf: PDFDocument): Promise<PDFImage | null> {
 
 export async function renderLabelPdf(doc: LabelDocument): Promise<Blob> {
   const pdf = await PDFDocument.create();
-  pdf.setTitle(`${company.name} label ${doc.cmId}`);
+  pdf.setTitle(`${company.name} ${doc.cmId}`);
   pdf.setSubject(doc.strings.documentTitle);
-  pdf.setProducer(company.generator);
-  pdf.setCreator(company.generator);
+  // No producer/creator credit: the sheet must carry no generator trace.
 
   const fonts: Fonts = {
     regular: await pdf.embedFont(StandardFonts.Helvetica),
     bold: await pdf.embedFont(StandardFonts.HelveticaBold),
-    mono: await pdf.embedFont(StandardFonts.Courier),
     monoBold: await pdf.embedFont(StandardFonts.CourierBold),
   };
 
-  const page = pdf.addPage([A4.width, A4.height]);
+  const page = pdf.addPage([PAGE.width, PAGE.height]);
   const logo = await loadLogo(pdf);
-  const contentWidth = A4.width - MARGIN * 2;
+  const contentWidth = PAGE.width - MARGIN * 2;
 
-  let cursorY = A4.height - MARGIN;
+  let cursorY = PAGE.height - MARGIN;
 
   // --- header ---------------------------------------------------------------
   const headerTop = cursorY;
   if (logo) {
-    const targetHeight = 31; // 11 mm
+    const targetHeight = 22.7; // 8 mm
     const ratio = logo.width / logo.height;
     page.drawImage(logo, {
       x: MARGIN,
       y: headerTop - targetHeight,
-      width: Math.min(targetHeight * ratio, 238),
+      width: Math.min(targetHeight * ratio, 176),
       height: targetHeight,
     });
     page.drawText(toWinAnsi(company.productLine), {
       x: MARGIN,
-      y: headerTop - targetHeight - 10,
-      size: 6,
+      y: headerTop - targetHeight - 7,
+      size: 4.6,
       font: fonts.regular,
       color: color(GREY),
     });
@@ -154,174 +153,122 @@ export async function renderLabelPdf(doc: LabelDocument): Promise<Blob> {
     const colorWord = company.name.split(' ')[0] ?? 'COLOR';
     const metalWord = company.name.split(' ')[1] ?? 'METAL';
     page.drawText(toWinAnsi(colorWord), {
-      x: MARGIN,
-      y: headerTop - 22,
-      size: 22,
-      font: fonts.bold,
-      color: color(GOLD),
+      x: MARGIN, y: headerTop - 15, size: 15, font: fonts.bold, color: color(GOLD),
     });
     page.drawText(toWinAnsi(metalWord), {
-      x: MARGIN + fonts.bold.widthOfTextAtSize(toWinAnsi(colorWord), 22) + 7,
-      y: headerTop - 22,
-      size: 22,
-      font: fonts.bold,
-      color: color(GREY),
+      x: MARGIN + fonts.bold.widthOfTextAtSize(toWinAnsi(colorWord), 15) + 5,
+      y: headerTop - 15, size: 15, font: fonts.bold, color: color(GREY),
     });
     page.drawText(toWinAnsi(company.tagline), {
-      x: MARGIN,
-      y: headerTop - 33,
-      size: 6.5,
-      font: fonts.regular,
-      color: color(GREY),
+      x: MARGIN, y: headerTop - 23, size: 5, font: fonts.regular, color: color(GREY),
     });
     page.drawText(toWinAnsi(company.productLine), {
-      x: MARGIN,
-      y: headerTop - 43,
-      size: 6,
-      font: fonts.regular,
-      color: color(GREY),
+      x: MARGIN, y: headerTop - 30, size: 4.6, font: fonts.regular, color: color(GREY),
     });
   }
 
-  drawRight(page, doc.strings.documentTitle.toUpperCase(), fonts.bold, 11, headerTop - 11, MARGIN, contentWidth, INK);
-  drawRight(page, doc.strings.cmIdLabel.toUpperCase(), fonts.regular, 6.5, headerTop - 24, MARGIN, contentWidth, MUTED);
-  drawRight(page, doc.cmId, fonts.monoBold, 14, headerTop - 39, MARGIN, contentWidth, INK);
+  drawRight(page, doc.strings.documentTitle.toUpperCase(), fonts.bold, 8, headerTop - 8, contentWidth, INK);
+  drawRight(page, doc.strings.cmIdLabel.toUpperCase(), fonts.regular, 4.8, headerTop - 17, contentWidth, MUTED);
+  drawRight(page, doc.cmId, fonts.monoBold, 10.5, headerTop - 29, contentWidth, INK);
 
-  cursorY = headerTop - 52;
+  cursorY = headerTop - 38;
 
   // Header rule with a gold accent segment.
-  page.drawRectangle({ x: MARGIN, y: cursorY, width: contentWidth - 96, height: 3.4, color: color(INK) });
-  page.drawRectangle({ x: MARGIN + contentWidth - 96, y: cursorY, width: 96, height: 3.4, color: color(GOLD) });
-  cursorY -= 16;
+  page.drawRectangle({ x: MARGIN, y: cursorY, width: contentWidth - 68, height: 2.55, color: color(INK) });
+  page.drawRectangle({ x: MARGIN + contentWidth - 68, y: cursorY, width: 68, height: 2.55, color: color(GOLD) });
+  cursorY -= 12;
 
   // --- delivery block -------------------------------------------------------
   if (doc.delivery.length > 0) {
-    const rowsPerLine = Math.min(3, doc.delivery.length);
-    const lines = Math.ceil(doc.delivery.length / rowsPerLine);
-    const blockHeight = 12 + lines * 22;
+    const perLine = Math.min(2, doc.delivery.length);
+    const lines = Math.ceil(doc.delivery.length / perLine);
+    const blockHeight = 8 + lines * 17;
     const blockY = cursorY - blockHeight;
     page.drawRectangle({
-      x: MARGIN,
-      y: blockY,
-      width: contentWidth,
-      height: blockHeight,
-      color: color(DELIVERY_BG),
-      borderColor: color(BORDER_STRONG),
-      borderWidth: 0.8,
+      x: MARGIN, y: blockY, width: contentWidth, height: blockHeight,
+      color: color(DELIVERY_BG), borderColor: color(BORDER_STRONG), borderWidth: 0.7,
     });
-    page.drawRectangle({ x: MARGIN, y: blockY, width: 3.4, height: blockHeight, color: color(GOLD) });
+    page.drawRectangle({ x: MARGIN, y: blockY, width: 2.8, height: blockHeight, color: color(GOLD) });
 
-    const cellWidth = (contentWidth - 24) / rowsPerLine;
+    const cellWidth = (contentWidth - 18) / perLine;
     doc.delivery.forEach((row, index) => {
-      const col = index % rowsPerLine;
-      const line = Math.floor(index / rowsPerLine);
-      const x = MARGIN + 12 + col * cellWidth;
-      const y = blockY + blockHeight - 12 - line * 22;
+      const col = index % perLine;
+      const line = Math.floor(index / perLine);
+      const x = MARGIN + 9 + col * cellWidth;
+      const y = blockY + blockHeight - 9 - line * 17;
       page.drawText(toWinAnsi(row.label.toUpperCase()), {
-        x,
-        y,
-        size: 6.5,
-        font: fonts.bold,
-        color: color(MUTED),
+        x, y, size: 4.8, font: fonts.bold, color: color(MUTED),
       });
-      const valueLines = wrapText(row.value, fonts.bold, 11, cellWidth - 8);
+      const valueLines = wrapText(row.value, fonts.bold, 8.5, cellWidth - 6);
       page.drawText(valueLines[0] ?? '', {
-        x,
-        y: y - 11,
-        size: 11,
-        font: fonts.bold,
-        color: color(INK),
+        x, y: y - 8.5, size: 8.5, font: fonts.bold, color: color(INK),
       });
     });
-    cursorY = blockY - 16;
+    cursorY = blockY - 12;
   }
 
   // --- hero -----------------------------------------------------------------
   if (doc.headline) {
     page.drawText(toWinAnsi(doc.headline), {
-      x: MARGIN,
-      y: cursorY - 20,
-      size: 20,
-      font: fonts.bold,
-      color: color(INK),
+      x: MARGIN, y: cursorY - 13, size: 13, font: fonts.bold, color: color(INK),
     });
-    cursorY -= 26;
+    cursorY -= 17;
   }
   if (doc.subheadline) {
-    const lines = wrapText(doc.subheadline, fonts.bold, 30, contentWidth);
+    const lines = wrapText(doc.subheadline, fonts.bold, 21, contentWidth);
     for (const line of lines) {
-      page.drawText(line, { x: MARGIN, y: cursorY - 30, size: 30, font: fonts.bold, color: color(INK) });
-      cursorY -= 33;
+      page.drawText(line, { x: MARGIN, y: cursorY - 21, size: 21, font: fonts.bold, color: color(INK) });
+      cursorY -= 23;
     }
-    cursorY -= 4;
+    cursorY -= 3;
   }
 
   if (doc.descriptors.length > 0) {
     let chipX = MARGIN;
-    const chipY = cursorY - 16;
+    const chipY = cursorY - 12;
     for (const chip of doc.descriptors) {
       const labelText = toWinAnsi(chip.label.toUpperCase());
       const valueText = toWinAnsi(chip.value);
       const width =
-        fonts.regular.widthOfTextAtSize(labelText, 6.5) +
-        fonts.bold.widthOfTextAtSize(valueText, 8.5) +
-        18;
+        fonts.regular.widthOfTextAtSize(labelText, 4.8) +
+        fonts.bold.widthOfTextAtSize(valueText, 7) + 13;
       if (chipX + width > MARGIN + contentWidth) break;
       page.drawRectangle({
-        x: chipX,
-        y: chipY,
-        width,
-        height: 16,
-        borderColor: color(BORDER_STRONG),
-        borderWidth: 0.7,
+        x: chipX, y: chipY, width, height: 12,
+        borderColor: color(BORDER_STRONG), borderWidth: 0.6,
       });
-      page.drawText(labelText, { x: chipX + 5, y: chipY + 5, size: 6.5, font: fonts.regular, color: color(MUTED) });
+      page.drawText(labelText, { x: chipX + 4, y: chipY + 4, size: 4.8, font: fonts.regular, color: color(MUTED) });
       page.drawText(valueText, {
-        x: chipX + 9 + fonts.regular.widthOfTextAtSize(labelText, 6.5),
-        y: chipY + 4.5,
-        size: 8.5,
-        font: fonts.bold,
-        color: color(INK),
+        x: chipX + 7 + fonts.regular.widthOfTextAtSize(labelText, 4.8),
+        y: chipY + 3.4, size: 7, font: fonts.bold, color: color(INK),
       });
-      chipX += width + 6;
+      chipX += width + 4;
     }
-    cursorY = chipY - 14;
+    cursorY = chipY - 11;
   }
 
   // --- metrics --------------------------------------------------------------
   if (doc.metrics.length > 0) {
     const count = doc.metrics.length;
-    const boxGap = 8;
+    const boxGap = 5.7;
     const boxWidth = (contentWidth - boxGap * (count - 1)) / count;
-    const boxHeight = 46;
+    const boxHeight = 32;
     const boxY = cursorY - boxHeight;
     doc.metrics.forEach((metric, index) => {
       const x = MARGIN + index * (boxWidth + boxGap);
       page.drawRectangle({
-        x,
-        y: boxY,
-        width: boxWidth,
-        height: boxHeight,
-        borderColor: color(INK),
-        borderWidth: 1,
+        x, y: boxY, width: boxWidth, height: boxHeight,
+        borderColor: color(INK), borderWidth: 0.85,
       });
       page.drawText(toWinAnsi(metric.label.toUpperCase()), {
-        x: x + 7,
-        y: boxY + boxHeight - 13,
-        size: 6.5,
-        font: fonts.bold,
-        color: color(MUTED),
+        x: x + 5, y: boxY + boxHeight - 9, size: 4.6, font: fonts.bold, color: color(MUTED),
       });
-      const valueLines = wrapText(metric.value, fonts.bold, 19, boxWidth - 14);
+      const valueLines = wrapText(metric.value, fonts.bold, 13, boxWidth - 10);
       page.drawText(valueLines[0] ?? '', {
-        x: x + 7,
-        y: boxY + 10,
-        size: 19,
-        font: fonts.bold,
-        color: color(INK),
+        x: x + 5, y: boxY + 7, size: 13, font: fonts.bold, color: color(INK),
       });
     });
-    cursorY = boxY - 18;
+    cursorY = boxY - 12;
   }
 
   // --- sections in two balanced columns -------------------------------------
@@ -336,73 +283,34 @@ export async function renderLabelPdf(doc: LabelDocument): Promise<Blob> {
     { x: MARGIN + columnWidth + GUTTER, y: cursorY },
   ];
 
-  const footerTop = MARGIN + 46;
+  const footerTop = MARGIN + 24;
 
   for (const entry of measured) {
-    // Place into whichever column currently reaches lower down the page.
     const target = (columns[0]?.y ?? 0) >= (columns[1]?.y ?? 0) ? columns[0] : columns[1];
     if (!target) break;
     if (target.y - entry.height < footerTop) {
       const other = target === columns[0] ? columns[1] : columns[0];
-      if (!other || other.y - entry.height < footerTop) continue; // will not fit; skip
+      if (!other || other.y - entry.height < footerTop) continue;
       drawSection(page, entry.section, fonts, other.x, other.y, columnWidth);
-      other.y -= entry.height + 10;
+      other.y -= entry.height + 8;
       continue;
     }
     drawSection(page, entry.section, fonts, target.x, target.y, columnWidth);
-    target.y -= entry.height + 10;
+    target.y -= entry.height + 8;
   }
 
-  // --- notes + footer -------------------------------------------------------
-  let noteY = footerTop + 14;
-  if (doc.notes.length > 0) {
-    for (const note of doc.notes.slice(0, 3)) {
-      const lines = wrapText(`• ${note}`, fonts.regular, 7, contentWidth);
-      for (const line of lines) {
-        page.drawText(line, { x: MARGIN, y: noteY, size: 7, font: fonts.regular, color: color(MUTED) });
-        noteY += 9;
-      }
-    }
-  }
-
-  page.drawRectangle({ x: MARGIN, y: MARGIN + 34, width: contentWidth, height: 1.4, color: color(INK) });
+  // --- footer ---------------------------------------------------------------
+  // CM ID, legal entity and the date. Nothing else — no generator, no template.
+  page.drawRectangle({ x: MARGIN, y: MARGIN + 20, width: contentWidth, height: 1.1, color: color(INK) });
   page.drawText(toWinAnsi(doc.cmId), {
-    x: MARGIN,
-    y: MARGIN + 22,
-    size: 8,
-    font: fonts.monoBold,
-    color: color(INK),
+    x: MARGIN, y: MARGIN + 12, size: 6.4, font: fonts.monoBold, color: color(INK),
   });
   page.drawText(toWinAnsi(doc.footer.companyLine), {
-    x: MARGIN,
-    y: MARGIN + 11,
-    size: 7,
-    font: fonts.regular,
-    color: color(MUTED),
+    x: MARGIN, y: MARGIN + 5, size: 5.4, font: fonts.regular, color: color(MUTED),
   });
-  drawRight(
-    page,
-    `${doc.strings.generatedBy} ${doc.footer.generator} · ${doc.footer.generatedAtLabel}`,
-    fonts.regular,
-    7,
-    MARGIN + 22,
-    MARGIN,
-    contentWidth,
-    MUTED,
-  );
-  drawRight(
-    page,
-    `${doc.strings.template} ${doc.footer.version}`,
-    fonts.regular,
-    7,
-    MARGIN + 11,
-    MARGIN,
-    contentWidth,
-    MUTED,
-  );
+  drawRight(page, doc.footer.generatedAtLabel, fonts.regular, 5.4, MARGIN + 5, contentWidth, MUTED);
 
   const bytes = await pdf.save();
-  // Copy into a fresh ArrayBuffer so the Blob is not tied to WASM memory.
   return new Blob([new Uint8Array(bytes)], { type: 'application/pdf' });
 }
 
@@ -412,24 +320,23 @@ function drawRight(
   font: PDFFont,
   size: number,
   y: number,
-  margin: number,
   contentWidth: number,
   tone: { r: number; g: number; b: number },
 ): void {
   const safe = toWinAnsi(text);
   const width = font.widthOfTextAtSize(safe, size);
-  page.drawText(safe, { x: margin + contentWidth - width, y, size, font, color: color(tone) });
+  page.drawText(safe, { x: MARGIN + contentWidth - width, y, size, font, color: color(tone) });
 }
 
-const SECTION_TITLE_HEIGHT = 15;
-const ROW_LINE_HEIGHT = 11;
+const SECTION_TITLE_HEIGHT = 11;
+const ROW_LINE_HEIGHT = 8.6;
 
 function measureSection(section: LabelSection, fonts: Fonts, width: number): number {
-  const valueWidth = width * 0.62 - 8;
-  let height = SECTION_TITLE_HEIGHT + 4;
+  const valueWidth = width * 0.6 - 6;
+  let height = SECTION_TITLE_HEIGHT + 3;
   for (const row of section.rows) {
-    const lines = wrapText(row.value, fonts.bold, 9.5, valueWidth);
-    height += Math.max(ROW_LINE_HEIGHT, lines.length * ROW_LINE_HEIGHT) + 2;
+    const lines = wrapText(row.value, fonts.bold, 7.4, valueWidth);
+    height += Math.max(ROW_LINE_HEIGHT, lines.length * ROW_LINE_HEIGHT) + 1.5;
   }
   return height;
 }
@@ -443,55 +350,35 @@ function drawSection(
   width: number,
 ): void {
   page.drawRectangle({
-    x,
-    y: top - SECTION_TITLE_HEIGHT,
-    width,
-    height: SECTION_TITLE_HEIGHT,
-    color: color(TINT),
+    x, y: top - SECTION_TITLE_HEIGHT, width, height: SECTION_TITLE_HEIGHT, color: color(TINT),
   });
   page.drawRectangle({
-    x,
-    y: top - SECTION_TITLE_HEIGHT,
-    width: 2.3,
-    height: SECTION_TITLE_HEIGHT,
-    color: color(INK),
+    x, y: top - SECTION_TITLE_HEIGHT, width: 1.7, height: SECTION_TITLE_HEIGHT, color: color(INK),
   });
   page.drawText(toWinAnsi(section.title.toUpperCase()), {
-    x: x + 7,
-    y: top - 11,
-    size: 7,
-    font: fonts.bold,
-    color: color(INK),
+    x: x + 5, y: top - 8, size: 5.4, font: fonts.bold, color: color(INK),
   });
 
-  let y = top - SECTION_TITLE_HEIGHT - 4;
-  const labelWidth = width * 0.38;
-  const valueX = x + labelWidth + 4;
-  const valueWidth = width * 0.62 - 8;
+  let y = top - SECTION_TITLE_HEIGHT - 3;
+  const labelWidth = width * 0.4;
+  const valueX = x + labelWidth + 3;
+  const valueWidth = width * 0.6 - 6;
 
   for (const row of section.rows) {
-    const valueLines = wrapText(row.value, fonts.bold, 9.5, valueWidth);
+    const valueLines = wrapText(row.value, fonts.bold, 7.4, valueWidth);
     const rowHeight = Math.max(ROW_LINE_HEIGHT, valueLines.length * ROW_LINE_HEIGHT);
 
     page.drawText(toWinAnsi(row.label), {
-      x: x + 3,
-      y: y - 8,
-      size: 7.5,
-      font: fonts.regular,
-      color: color(MUTED),
+      x: x + 2, y: y - 6.5, size: 5.8, font: fonts.regular, color: color(MUTED),
     });
     valueLines.forEach((line, index) => {
       page.drawText(line, {
-        x: valueX,
-        y: y - 8 - index * ROW_LINE_HEIGHT,
-        size: 9.5,
-        font: fonts.bold,
-        color: color(INK),
+        x: valueX, y: y - 6.5 - index * ROW_LINE_HEIGHT, size: 7.4, font: fonts.bold, color: color(INK),
       });
     });
 
-    y -= rowHeight + 2;
-    page.drawRectangle({ x, y: y + 1, width, height: 0.4, color: color(BORDER) });
+    y -= rowHeight + 1.5;
+    page.drawRectangle({ x, y: y + 0.8, width, height: 0.3, color: color(BORDER) });
   }
 }
 

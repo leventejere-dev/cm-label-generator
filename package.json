@@ -3,7 +3,7 @@
   "private": true,
   "version": "0.1.0",
   "type": "module",
-  "description": "CM Label Generator \u2014 photograph a supplier material label, extract it with multimodal AI, strip supplier identity, print a standardized Color Metal A4 label.",
+  "description": "CM Label Generator — photograph a supplier material label, extract it with multimodal AI, strip supplier identity, print a standardized Color Metal A4 label.",
   "engines": {
     "node": ">=20.11"
   },
@@ -32,6 +32,7 @@
     "@types/react": "^18.3.11",
     "@types/react-dom": "^18.3.0",
     "@vitejs/plugin-react": "^4.3.2",
+    "playwright": "^1.62.1",
     "typescript": "^5.6.2",
     "vite": "^5.4.8",
     "vitest": "^2.1.2"

@@ -18,8 +18,11 @@ export const LABEL_STATUS_LABELS: Record<LabelStatus, string> = {
   failed: 'Failed',
 };
 
-/** Version tag of the A4 template used, so old records can be re-rendered faithfully. */
-export const CURRENT_LABEL_TEMPLATE = 'cm-a4-v1';
+/**
+ * Version tag of the label template used, so old records can be re-rendered
+ * faithfully. Stored with the record; never printed on the sheet.
+ */
+export const CURRENT_LABEL_TEMPLATE = 'cm-a5-v1';
 
 export interface LabelRecord {
   id: string;

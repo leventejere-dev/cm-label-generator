@@ -31,8 +31,11 @@ const supabaseConfigured =
 
 /**
  * Mock mode resolution:
- *   "true"  -> always mock
- *   "false" -> always live (will surface a clear error if Supabase is missing)
+ *   "true"  -> always mock (local fixtures, no network)
+ *   "false" -> always live. If Supabase is missing the app raises a clear
+ *              error rather than silently serving fixture data — printing
+ *              invented material data on a warehouse label would be worse
+ *              than failing.
  *   "auto"  -> mock only when Supabase is not configured  (default)
  */
 function resolveMockMode(): boolean {
@@ -40,6 +43,23 @@ function resolveMockMode(): boolean {
   if (raw === 'true') return true;
   if (raw === 'false') return false;
   return !supabaseConfigured;
+}
+
+/**
+ * Where finished labels are kept.
+ *   "supabase" -> Postgres + private Storage bucket (shared across devices)
+ *   "local"    -> this device only (localStorage + IndexedDB). Nothing is
+ *                 uploaded anywhere; the photo is sent to the extraction
+ *                 service for the single call and never stored.
+ *   "auto"     -> supabase when configured, else local  (default)
+ */
+export type PersistenceMode = 'supabase' | 'local';
+
+function resolvePersistence(): PersistenceMode {
+  const raw = str(import.meta.env.VITE_PERSISTENCE, 'auto').toLowerCase();
+  if (raw === 'local' || raw === 'none') return 'local';
+  if (raw === 'supabase') return 'supabase';
+  return supabaseConfigured ? 'supabase' : 'local';
 }
 
 export const env = {
@@ -56,6 +76,12 @@ export const env = {
 
   /** When true the app runs entirely from local fixtures + localStorage. */
   mockMode: resolveMockMode(),
+
+  /**
+   * Storage target for finished labels. Independent of mockMode, so the app can
+   * use the real extraction service while keeping every label on the device.
+   */
+  persistence: resolvePersistence(),
 
   image: {
     /** Longest edge in px after downscaling. Keeps small technical text legible. */

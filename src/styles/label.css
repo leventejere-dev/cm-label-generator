@@ -1,31 +1,38 @@
 /* ---------------------------------------------------------------------------
-   COLOR METAL A4 LABEL
+   COLOR METAL MATERIAL LABEL — A5 (148 × 210 mm)
    ---------------------------------------------------------------------------
+   Half an A4 sheet: two labels per sheet if printed 2-up, and small enough to
+   sit on a bundle or pallet without wrapping around it.
+
    Physical dimensions are in millimetres so the on-screen preview and the
    printed sheet are the same document. The preview is scaled with a CSS
-   transform on .a4-scaler; printing removes that transform.
+   transform on .sheet-scaler; printing removes that transform.
 
-   Deliberately monochrome apart from one accent rule: an operational warehouse
-   label must print identically on any office laser printer, including one with
-   no colour toner.
+   Deliberately near-monochrome with one gold accent rule: an operational
+   warehouse label must print identically on any office laser printer,
+   including one with no colour toner.
+
+   NOTHING on this sheet may reveal that the data came from a supplier's own
+   label. No generator credit, no template version, no "codes not reproduced"
+   note, and no procurement references — those live on the review screen only.
    --------------------------------------------------------------------------- */
 
-.a4-viewport {
+.sheet-viewport {
   position: relative;
   width: 100%;
   overflow: hidden;
 }
 
-.a4-scaler {
-  transform: scale(var(--a4-scale, 1));
+.sheet-scaler {
+  transform: scale(var(--sheet-scale, 1));
   transform-origin: top left;
-  width: 210mm;
+  width: 148mm;
 }
 
-.a4-sheet {
-  width: 210mm;
-  height: 297mm;
-  padding: 12mm 12mm 10mm;
+.sheet {
+  width: 148mm;
+  height: 210mm;
+  padding: 8mm 8mm 6mm;
   background: #fff;
   color: #2e2e30;
   box-sizing: border-box;
@@ -33,198 +40,197 @@
   flex-direction: column;
   overflow: hidden;
   font-family: var(--cm-font-ui);
-  /* Fixed 1mm = 1mm typography: sizes below are in pt for print fidelity. */
-  font-size: 9pt;
-  line-height: 1.35;
+  font-size: 7.5pt;
+  line-height: 1.3;
   box-shadow: var(--cm-shadow-lg);
 }
 
 /* --- header --------------------------------------------------------------- */
 
-.a4__header {
+.sheet__header {
   display: flex;
   align-items: flex-start;
   justify-content: space-between;
-  gap: 8mm;
-  padding-bottom: 4mm;
+  gap: 5mm;
+  padding-bottom: 2.5mm;
 }
 
-.a4__brand {
+.sheet__brand {
   display: flex;
   flex-direction: column;
-  gap: 1.5mm;
+  gap: 1mm;
+  min-width: 0;
 }
 
-.a4__logo {
-  height: 11mm;
+.sheet__logo {
+  height: 8mm;
   width: auto;
-  max-width: 84mm;
+  max-width: 62mm;
   object-fit: contain;
   object-position: left center;
 }
 
-.a4__productline {
-  font-size: 6pt;
-  letter-spacing: 0.16em;
+.sheet__productline {
+  font-size: 4.6pt;
+  letter-spacing: 0.14em;
   color: #939393;
   text-transform: uppercase;
   white-space: nowrap;
 }
 
-.a4__wordmark {
-  font-size: 22pt;
+.sheet__wordmark {
+  font-size: 15pt;
   font-weight: 700;
-  letter-spacing: 0.06em;
+  letter-spacing: 0.05em;
   line-height: 1;
 }
 
-.a4__wordmark-sub {
-  font-size: 7pt;
-  letter-spacing: 0.22em;
+.sheet__wordmark-sub {
+  font-size: 5pt;
+  letter-spacing: 0.2em;
   color: #6e6f71;
   text-transform: uppercase;
 }
 
-.a4__docmeta {
+.sheet__docmeta {
   text-align: right;
+  white-space: nowrap;
 }
 
-.a4__doctitle {
-  font-size: 11pt;
+.sheet__doctitle {
+  font-size: 8pt;
   font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.sheet__cmid-label {
+  margin-top: 1.4mm;
+  font-size: 4.8pt;
   letter-spacing: 0.14em;
   text-transform: uppercase;
-}
-
-.a4__cmid-label {
-  margin-top: 2mm;
-  font-size: 6.5pt;
-  letter-spacing: 0.16em;
-  text-transform: uppercase;
   color: #6e6f71;
 }
 
-.a4__cmid {
+.sheet__cmid {
   font-family: var(--cm-font-mono);
-  font-size: 14pt;
+  font-size: 10.5pt;
   font-weight: 700;
-  letter-spacing: 0.02em;
 }
 
-.a4__rule {
+.sheet__rule {
   display: flex;
-  height: 1.2mm;
-  margin-bottom: 5mm;
+  height: 0.9mm;
+  margin-bottom: 3.5mm;
 }
 
-.a4__rule-main { flex: 1; background: #2e2e30; }
-.a4__rule-accent { width: 34mm; background: var(--cm-brand-gold, #bfa060); }
-
-/* --- hero ----------------------------------------------------------------- */
+.sheet__rule-main { flex: 1; background: #2e2e30; }
+.sheet__rule-accent { width: 24mm; background: var(--cm-brand-gold, #bfa060); }
 
 /* --- delivery block ------------------------------------------------------- */
 
-.a4__delivery {
+.sheet__delivery {
   display: flex;
   flex-wrap: wrap;
-  gap: 2mm 8mm;
-  padding: 3mm 4mm;
-  margin-bottom: 5mm;
-  border: 0.35mm solid #c2c1bd;
-  border-left: 1.2mm solid var(--cm-brand-gold, #bfa060);
-  border-radius: 1mm;
+  gap: 1.5mm 6mm;
+  padding: 2.2mm 3mm;
+  margin-bottom: 3.5mm;
+  border: 0.25mm solid #c2c1bd;
+  border-left: 1mm solid var(--cm-brand-gold, #bfa060);
+  border-radius: 0.8mm;
   background: #fafaf9;
 }
 
-.a4__delivery-item { min-width: 0; }
+.sheet__delivery-item { min-width: 0; }
 
-.a4__delivery-label {
-  font-size: 6.5pt;
+.sheet__delivery-label {
+  font-size: 4.8pt;
   font-weight: 700;
-  letter-spacing: 0.13em;
+  letter-spacing: 0.12em;
   text-transform: uppercase;
   color: #6e6f71;
 }
 
-.a4__delivery-value {
-  font-size: 11pt;
+.sheet__delivery-value {
+  font-size: 8.5pt;
   font-weight: 700;
   line-height: 1.2;
 }
 
-.a4__hero { margin-bottom: 5mm; }
+/* --- hero ----------------------------------------------------------------- */
 
-.a4__headline {
-  font-size: 20pt;
+.sheet__hero { margin-bottom: 3.5mm; }
+
+.sheet__headline {
+  font-size: 13pt;
   font-weight: 700;
-  letter-spacing: 0.01em;
   line-height: 1.1;
   text-transform: uppercase;
 }
 
-.a4__subheadline {
-  margin-top: 1.5mm;
-  font-size: 30pt;
+.sheet__subheadline {
+  margin-top: 1mm;
+  font-size: 21pt;
   font-weight: 700;
   line-height: 1.05;
   letter-spacing: -0.01em;
   font-variant-numeric: tabular-nums;
 }
 
-.a4__descriptors {
+.sheet__descriptors {
   display: flex;
   flex-wrap: wrap;
-  gap: 2mm;
-  margin-top: 3mm;
+  gap: 1.4mm;
+  margin-top: 2mm;
 }
 
-.a4__chip {
+.sheet__chip {
   display: inline-flex;
   align-items: baseline;
-  gap: 1.6mm;
-  padding: 1.2mm 2.6mm;
-  border: 0.3mm solid #c2c1bd;
-  border-radius: 1mm;
-  font-size: 8.5pt;
+  gap: 1.2mm;
+  padding: 0.9mm 1.8mm;
+  border: 0.25mm solid #c2c1bd;
+  border-radius: 0.7mm;
+  font-size: 7pt;
 }
 
-.a4__chip-label {
-  font-size: 6.5pt;
-  letter-spacing: 0.12em;
+.sheet__chip-label {
+  font-size: 4.8pt;
+  letter-spacing: 0.1em;
   text-transform: uppercase;
   color: #6e6f71;
 }
 
-.a4__chip-value { font-weight: 700; }
+.sheet__chip-value { font-weight: 700; }
 
 /* --- metrics -------------------------------------------------------------- */
 
-.a4__metrics {
+.sheet__metrics {
   display: grid;
   grid-auto-flow: column;
   grid-auto-columns: 1fr;
-  gap: 3mm;
-  margin-bottom: 6mm;
+  gap: 2mm;
+  margin-bottom: 4mm;
 }
 
-.a4__metric {
-  border: 0.35mm solid #2e2e30;
-  border-radius: 1mm;
-  padding: 2.5mm 3mm 3mm;
+.sheet__metric {
+  border: 0.3mm solid #2e2e30;
+  border-radius: 0.8mm;
+  padding: 1.6mm 2mm 2mm;
   min-width: 0;
 }
 
-.a4__metric-label {
-  font-size: 6.5pt;
+.sheet__metric-label {
+  font-size: 4.6pt;
   font-weight: 700;
-  letter-spacing: 0.13em;
+  letter-spacing: 0.1em;
   text-transform: uppercase;
   color: #6e6f71;
 }
 
-.a4__metric-value {
-  margin-top: 0.8mm;
-  font-size: 19pt;
+.sheet__metric-value {
+  margin-top: 0.5mm;
+  font-size: 13pt;
   font-weight: 700;
   line-height: 1.05;
   font-variant-numeric: tabular-nums;
@@ -239,99 +245,89 @@
   balanced automatically instead of leaving ragged grid rows.
 
   A section is never split across columns. If the content still does not fit,
-  A4Label detects the overflow and the operator is told, rather than losing a
-  row silently.
+  LabelSheet detects the overflow and the operator is told, rather than losing
+  a row silently.
 */
-.a4__sections {
+.sheet__sections {
   columns: 2;
-  column-gap: 6mm;
+  column-gap: 4.5mm;
   column-fill: balance;
   flex: 1;
   min-height: 0;
   overflow: hidden;
 }
 
-.a4__section {
+.sheet__section {
   break-inside: avoid;
   -webkit-column-break-inside: avoid;
   page-break-inside: avoid;
-  margin-bottom: 4mm;
+  margin-bottom: 3mm;
 }
 
-.a4__section-title {
-  font-size: 7pt;
+.sheet__section-title {
+  font-size: 5.4pt;
   font-weight: 700;
-  letter-spacing: 0.14em;
+  letter-spacing: 0.12em;
   text-transform: uppercase;
   color: #2e2e30;
-  padding: 1.2mm 2mm;
+  padding: 0.9mm 1.5mm;
   background: #f1efea;
-  border-left: 0.8mm solid #2e2e30;
-  margin-bottom: 1.5mm;
+  border-left: 0.6mm solid #2e2e30;
+  margin-bottom: 1mm;
 }
 
-.a4__rows { width: 100%; border-collapse: collapse; }
+.sheet__rows { width: 100%; border-collapse: collapse; }
 
-.a4__rows tr { border-bottom: 0.2mm solid #e1e0dd; }
-.a4__rows tr:last-child { border-bottom: none; }
+.sheet__rows tr { border-bottom: 0.15mm solid #e1e0dd; }
+.sheet__rows tr:last-child { border-bottom: none; }
 
-.a4__rows th {
-  width: 38%;
+.sheet__rows th {
+  width: 40%;
   text-align: left;
   vertical-align: top;
-  padding: 1.1mm 2mm 1.1mm 2mm;
-  font-size: 7.5pt;
+  padding: 0.8mm 1.5mm;
+  font-size: 5.8pt;
   font-weight: 500;
   color: #6e6f71;
 }
 
-.a4__rows td {
+.sheet__rows td {
   text-align: left;
   vertical-align: top;
-  padding: 1.1mm 2mm;
-  font-size: 9.5pt;
+  padding: 0.8mm 1.5mm;
+  font-size: 7.4pt;
   font-weight: 700;
   font-variant-numeric: tabular-nums;
   word-break: break-word;
 }
 
-/* --- notes + footer ------------------------------------------------------- */
+/* --- footer --------------------------------------------------------------- */
 
-.a4__notes {
-  margin-top: 4mm;
-  padding-top: 2mm;
-  border-top: 0.2mm dashed #c2c1bd;
-  font-size: 7pt;
-  color: #6e6f71;
-}
-
-.a4__notes li { margin-left: 4mm; }
-
-.a4__footer {
+.sheet__footer {
   margin-top: auto;
-  padding-top: 3mm;
-  border-top: 0.5mm solid #2e2e30;
+  padding-top: 2mm;
+  border-top: 0.4mm solid #2e2e30;
   display: flex;
   justify-content: space-between;
   align-items: flex-end;
-  gap: 6mm;
-  font-size: 7pt;
+  gap: 4mm;
+  font-size: 5.4pt;
   color: #6e6f71;
 }
 
-.a4__footer-strong {
+.sheet__footer-strong {
   font-weight: 700;
   color: #2e2e30;
   font-family: var(--cm-font-mono);
-  font-size: 8pt;
+  font-size: 6.4pt;
 }
 
-.a4__footer-right { text-align: right; }
+.sheet__footer-right { text-align: right; }
 
 /* Reserved slot for a future Color Metal QR code. Hidden until enabled. */
-.a4__code-slot {
-  width: 22mm;
-  height: 22mm;
-  border: 0.3mm dashed #c2c1bd;
+.sheet__code-slot {
+  width: 16mm;
+  height: 16mm;
+  border: 0.25mm dashed #c2c1bd;
   display: none;
 }

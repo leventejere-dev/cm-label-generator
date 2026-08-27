@@ -50,10 +50,23 @@ export function setExtractionProvider(provider: LabelExtractionProvider | null):
 
 export async function getExtractionProvider(): Promise<LabelExtractionProvider> {
   if (override) return override;
-  if (env.mockMode || !env.supabase.configured) {
+
+  if (env.mockMode) {
     const { MockExtractionProvider } = await import('./mockProvider');
     return new MockExtractionProvider();
   }
+
+  // Live mode with no backend must FAIL, not quietly fall back to fixtures.
+  // Fixture data on a printed warehouse label would be invented material data.
+  if (!env.supabase.configured) {
+    const { appError } = await import('../../lib/errors');
+    throw appError('NOT_CONFIGURED', {
+      title: 'The analysis service is not connected',
+      detail:
+        'This installation is set to live mode but has no extraction service configured. Contact whoever set up the app — no values can be read from a photo until it is connected.',
+    });
+  }
+
   const { EdgeFunctionExtractionProvider } = await import('./edgeFunctionProvider');
   return new EdgeFunctionExtractionProvider();
 }

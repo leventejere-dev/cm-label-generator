@@ -46,16 +46,6 @@ export function HomePage() {
           </p>
         </section>
 
-        {env.mockMode ? (
-          <Card padded>
-            <span className="mode-pill">Demo mode</span>
-            <p style={{ marginTop: 'var(--cm-space-2)', fontSize: 'var(--cm-text-sm)' }}>
-              No AI credentials configured. Scans return realistic sample data and are saved on this
-              device only. See README §7 for mock mode and §5 to connect Supabase and a real AI provider.
-            </p>
-          </Card>
-        ) : null}
-
         <div className="hero-actions">
           <Button
             variant="primary"

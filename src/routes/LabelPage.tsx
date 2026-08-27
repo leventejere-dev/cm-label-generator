@@ -14,7 +14,7 @@ import { env } from '../config/env';
 import { CURRENT_LABEL_TEMPLATE, type LabelRecord } from '../domain/labelRecord';
 import type { LabelLanguage } from '../domain/fields';
 import { buildLabelDocument, labelHasContent } from '../domain/labelDocument';
-import { A4Label } from '../features/label/A4Label';
+import { LabelSheet } from '../features/label/LabelSheet';
 import { getRepository } from '../lib/data/repository';
 import { useLabelRecord } from '../lib/data/useLabelRecord';
 import { toAppError, type AppError } from '../lib/errors';
@@ -54,8 +54,6 @@ export function LabelPage() {
       cmId: record.cmId,
       generatedAt: new Date(record.updatedAt ?? record.createdAt),
       companyLine: company.legalLine,
-      generator: company.generator,
-      version: record.generatedLabelVersion || CURRENT_LABEL_TEMPLATE,
       language,
       removed,
     });
@@ -141,7 +139,7 @@ export function LabelPage() {
         <div className="no-print" style={{ display: 'flex', alignItems: 'flex-end', gap: 'var(--cm-space-4)', flexWrap: 'wrap' }}>
           <div style={{ flex: 1, minWidth: 200 }}>
             <h1 className="page-title">Color Metal label</h1>
-            <p className="page-subtitle">A4 · 210 × 297 mm · {record.cmId}</p>
+            <p className="page-subtitle">A5 · 148 × 210 mm · {record.cmId}</p>
           </div>
           <div role="group" aria-label="Label language" style={{ display: 'flex', gap: 4 }}>
             {(['ro', 'en'] as const).map((code) => (
@@ -181,15 +179,29 @@ export function LabelPage() {
           </Banner>
         ) : null}
 
+        {doc.internalNotes.length > 0 ? (
+          <div className="no-print">
+            <Banner tone="info" title="For your information — not printed on the label">
+              <ul style={{ margin: '4px 0 0', paddingLeft: 18 }}>
+                {doc.internalNotes.map((note) => (
+                  <li key={note}>{note}</li>
+                ))}
+              </ul>
+            </Banner>
+          </div>
+        ) : null}
+
         <div className="print-reset">
-          <A4Label doc={doc} onOverflowChange={setOverflowing} />
+          <LabelSheet doc={doc} onOverflowChange={setOverflowing} />
         </div>
 
         <Card padded className="no-print">
           <p style={{ fontSize: 'var(--cm-text-sm)' }}>
-            <strong>Printing:</strong> use <em>Print label</em> and choose A4, scale 100 % (not “fit
-            to page”). To keep a PDF, either pick “Save as PDF” in the print dialog — which keeps
-            every character exactly — or use <em>Export PDF</em> for a downloadable vector file.
+            <strong>Printing:</strong> use <em>Print label</em> and choose <strong>A5</strong>,
+            scale 100 % (not “fit to page”). If your printer only holds A4, print two labels per
+            sheet or select A5 and let the printer centre it. To keep a PDF, either pick “Save as
+            PDF” in the print dialog — which keeps every character exactly — or use{' '}
+            <em>Export PDF</em> for a downloadable vector file.
           </p>
         </Card>
 

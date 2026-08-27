@@ -31,15 +31,22 @@ export interface LabelRepository {
 
 let instance: LabelRepository | null = null;
 
-/** Lazily resolve the repository appropriate for the current configuration. */
+/**
+ * Lazily resolve the repository for the current configuration.
+ *
+ * Storage is chosen independently of the extraction provider: the app can use
+ * the real AI service while keeping every label on the device
+ * (VITE_PERSISTENCE=local), so nothing about a delivery ever leaves the phone
+ * except the single extraction call.
+ */
 export async function getRepository(): Promise<LabelRepository> {
   if (instance) return instance;
-  if (env.mockMode || !env.supabase.configured) {
-    const { LocalLabelRepository } = await import('./localRepository');
-    instance = new LocalLabelRepository();
-  } else {
+  if (env.persistence === 'supabase' && env.supabase.configured && !env.mockMode) {
     const { SupabaseLabelRepository } = await import('./supabaseRepository');
     instance = new SupabaseLabelRepository();
+  } else {
+    const { LocalLabelRepository } = await import('./localRepository');
+    instance = new LocalLabelRepository();
   }
   return instance;
 }

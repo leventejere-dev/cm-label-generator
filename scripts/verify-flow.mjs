@@ -96,13 +96,13 @@ await page.waitForURL(/#\/label\//, { timeout: 20000 });
 await page.waitForTimeout(1200);
 await page.screenshot({ path: `${SHOTS}/07-label-phone.png`, fullPage: true });
 console.log('LABEL url:', page.url());
-const firstCmId = (await page.locator('.a4__cmid').first().innerText()).trim();
+const firstCmId = (await page.locator('.sheet__cmid').first().innerText()).trim();
 console.log('first label CM ID:', firstCmId);
 
 // Print rendering: the A4 sheet at true size.
 await page.emulateMedia({ media: 'print' });
 await page.waitForTimeout(400);
-const pdf = await page.pdf({ path: `${SHOTS}/label-print.pdf`, format: 'A4', printBackground: true });
+const pdf = await page.pdf({ path: `${SHOTS}/label-print.pdf`, format: 'A5', printBackground: true });
 console.log('printed pdf bytes:', pdf.length);
 await page.emulateMedia({ media: 'screen' });
 
@@ -121,7 +121,7 @@ await page.waitForURL(/#\/review\//, { timeout: 30000 });
 await page.getByRole('button', { name: /Generate CM Label/i }).click();
 await page.waitForURL(/#\/label\//, { timeout: 20000 });
 await page.waitForTimeout(900);
-const secondCmId = await page.locator('.a4__cmid').first().innerText();
+const secondCmId = await page.locator('.sheet__cmid').first().innerText();
 console.log('second label CM ID:', secondCmId);
 
 // Now reopen the FIRST label from history while the session still holds the second.
@@ -135,7 +135,7 @@ for (let i = 0; i < rowCount; i += 1) {
   if (text.includes(firstCmId)) { await rows.nth(i).click(); opened = firstCmId; break; }
 }
 await page.waitForTimeout(1400);
-const shownCmId = await page.locator('.a4__cmid').first().innerText();
+const shownCmId = await page.locator('.sheet__cmid').first().innerText();
 console.log('reopened', opened, '-> sheet shows', shownCmId);
 if (opened && shownCmId !== opened) {
   throw new Error(`STALE SESSION BUG: opened ${opened} but the sheet rendered ${shownCmId}`);
