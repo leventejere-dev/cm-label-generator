@@ -1,0 +1,59 @@
+# ---------------------------------------------------------------------------
+# ONE-TIME BOOTSTRAP — safe to delete once the project files are in the repo.
+# ---------------------------------------------------------------------------
+name: Bootstrap project files
+
+on:
+  push:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: bootstrap
+  cancel-in-progress: false
+
+jobs:
+  expand:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Look for an archive to expand
+        id: check
+        run: |
+          if ls *.zip >/dev/null 2>&1; then
+            echo "found=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "No archive in the repository root - nothing to do."
+            echo "found=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Expand the archive into the repository
+        if: steps.check.outputs.found == 'true'
+        run: |
+          set -euo pipefail
+          ARCHIVE="$(ls *.zip | head -1)"
+          mkdir -p /tmp/expand
+          unzip -q "$ARCHIVE" -d /tmp/expand
+          SRC="$(find /tmp/expand -mindepth 1 -maxdepth 1 -type d | head -1)"
+          if [ -z "$SRC" ]; then SRC=/tmp/expand; fi
+          if [ ! -f "$SRC/package.json" ]; then SRC=/tmp/expand; fi
+          rsync -a --delete --exclude '.git' --exclude '.github' "$SRC"/ ./
+          rm -f "$ARCHIVE"
+          ls -la
+
+      - name: Commit the expanded project
+        if: steps.check.outputs.found == 'true'
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          if git diff --cached --quiet; then
+            echo "Nothing to commit."
+            exit 0
+          fi
+          git commit -m "Sync project files from uploaded archive"
+          git push
