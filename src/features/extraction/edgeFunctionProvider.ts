@@ -126,6 +126,8 @@ function mapFailure(failure: EdgeFailure | null | undefined) {
       return appError('AI_RATE_LIMITED');
     case 'DAILY_QUOTA_EXCEEDED':
       return appError('AI_DAILY_LIMIT');
+    case 'PROVIDER_OVERLOADED':
+      return appError('AI_BUSY');
     case 'AI_TIMEOUT':
       return appError('AI_TIMEOUT');
     case 'AI_INVALID_JSON':
@@ -143,10 +145,10 @@ function mapFailure(failure: EdgeFailure | null | undefined) {
           'The app is installed and working, but the image-reading service still has to be activated by whoever administers it. Nothing you did is wrong \u2014 please pass this message on and try again afterwards.',
       });
     default:
-      return appError('AI_PROVIDER_ERROR', {
-        detail: failure?.message
-          ? `The document analysis service returned an error: ${failure.message}`
-          : undefined,
-      });
+      // The provider's own message is raw English written for developers and
+      // often quotes an HTTP status. It must never reach the screen: the
+      // catalogue entry already says what to do, and the raw text is kept as
+      // `cause` so it is still there for diagnosis.
+      return appError('AI_PROVIDER_ERROR', { cause: failure?.message });
   }
 }

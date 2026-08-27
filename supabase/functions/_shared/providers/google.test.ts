@@ -160,6 +160,44 @@ Deno.test('falls back to another free model when the default one is gone', async
   }
 });
 
+Deno.test('an overloaded model is retried on the next free model', async () => {
+  // Seen in production on day one: the free tier answered 503 UNAVAILABLE
+  // ("This model is currently experiencing high demand"). That must not end the
+  // scan while other free models are sitting there.
+  let n = 0;
+  const stub = stubFetch(() => {
+    n += 1;
+    if (n === 1) {
+      return new Response(
+        '{"error":{"code":503,"message":"This model is currently experiencing high demand.","status":"UNAVAILABLE"}}',
+        { status: 503 },
+      );
+    }
+    return ok({ candidates: [{ content: { parts: [{ text: '{"documentType":"material_label"}' }] } }] });
+  });
+  try {
+    const result = await new GoogleProvider('K').extract(INPUT);
+    assertEquals(stub.calls.length, 2);
+    assert(stub.calls[0].url !== stub.calls[1].url, 'the retry must use a different model');
+    assertEquals((result.data as any).documentType, 'material_label');
+  } finally {
+    stub.restore();
+  }
+});
+
+Deno.test('when every free model is busy the caller learns it is busy, not broken', async () => {
+  // "Come back in a minute" and "someone has to configure this" are different
+  // instructions; collapsing them sends the employee looking for an admin.
+  const stub = stubFetch(() => new Response('{"error":{"code":503,"status":"UNAVAILABLE"}}', { status: 503 }));
+  try {
+    const error = await assertRejects(() => new GoogleProvider('K').extract(INPUT), ProviderError);
+    assertEquals((error as ProviderError).code, 'PROVIDER_OVERLOADED');
+    assert(stub.calls.length >= 2, 'every candidate model should have been tried');
+  } finally {
+    stub.restore();
+  }
+});
+
 Deno.test('an explicitly pinned model is never silently swapped', async () => {
   // If an operator pinned AI_MODEL, quietly using a different model would mean
   // labels read by a model nobody chose. Fail instead.

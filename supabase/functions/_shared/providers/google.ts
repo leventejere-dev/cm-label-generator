@@ -35,7 +35,7 @@ const DEFAULT_MODEL = 'gemini-3.5-flash';
  * cannot act on "model not found", so falling back to an older free-tier model
  * beats going dark. An explicitly configured AI_MODEL is never second-guessed.
  */
-const FALLBACK_MODELS = ['gemini-2.5-flash'];
+const FALLBACK_MODELS = ['gemini-2.5-flash', 'gemini-3.5-flash-lite'];
 
 export class GoogleProvider implements LabelExtractionProvider {
   readonly id = 'google';
@@ -57,11 +57,19 @@ export class GoogleProvider implements LabelExtractionProvider {
       try {
         return await this.extractWith(model, input);
       } catch (error) {
-        if (!(error instanceof ProviderError) || error.code !== 'MODEL_NOT_FOUND') throw error;
+        if (!(error instanceof ProviderError)) throw error;
+        // Both of these mean "this model can't serve us right now" — the next
+        // free model probably can, so keep going rather than failing the scan.
+        if (error.code !== 'MODEL_NOT_FOUND' && error.code !== 'PROVIDER_OVERLOADED') throw error;
         lastError = error;
       }
     }
 
+    // Every candidate was busy: that is a "come back in a minute", not a
+    // misconfiguration, and the two need different advice on screen.
+    if (lastError?.code === 'PROVIDER_OVERLOADED') {
+      throw new ProviderError('PROVIDER_OVERLOADED', 'Every candidate model is overloaded.', 503);
+    }
     throw new ProviderError(
       'PROVIDER_NOT_CONFIGURED',
       lastError?.message ?? 'No usable model was found for this API key.',
@@ -203,6 +211,12 @@ async function toGoogleError(response: Response): Promise<ProviderError> {
   // Internal code — caught by extract(), never returned to the browser.
   if (response.status === 404 || isModelMissing(text)) {
     return new ProviderError('MODEL_NOT_FOUND', `The model is unavailable for this key: ${message}`);
+  }
+
+  // 503 UNAVAILABLE is the free tier saying the model is busy; 5xx generally is
+  // the provider's problem, not the request's, and is worth another model.
+  if (response.status >= 500) {
+    return new ProviderError('PROVIDER_OVERLOADED', `Provider unavailable (${response.status}).`, 503);
   }
 
   if (response.status === 400 && /image|inline_?data|mime/i.test(message)) {

@@ -21,6 +21,7 @@ export type ErrorCode =
   | 'AI_PROVIDER_ERROR'
   | 'AI_RATE_LIMITED'
   | 'AI_DAILY_LIMIT'
+  | 'AI_BUSY'
   | 'AI_INVALID_JSON'
   | 'NO_LABEL_DETECTED'
   | 'MULTIPLE_LABELS_DETECTED'
@@ -183,6 +184,13 @@ const CATALOGUE: Record<ErrorCode, { title: string; detail: string; retryable: b
   DATABASE_FAILURE: {
     title: 'Eticheta nu a putut fi salvată',
     detail: 'Baza de date a respins cererea. Eticheta este în continuare pe ecran — o poți tipări, dar nu va apărea în Etichete recente.',
+    retryable: true,
+    retakeAdvised: false,
+  },
+  AI_BUSY: {
+    title: 'Serviciul de citire este ocupat acum',
+    detail:
+      'Prea multă lume folosește în acest moment serviciul gratuit de citire. Apasă „Reîncearcă analiza” peste un minut — fotografia ta nu s-a pierdut.',
     retryable: true,
     retakeAdvised: false,
   },

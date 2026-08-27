@@ -36,7 +36,7 @@ function nextIndex(): number {
 function sleep(ms: number, signal?: AbortSignal): Promise<void> {
   return new Promise((resolve, reject) => {
     if (signal?.aborted) {
-      reject(appError('UNKNOWN', { title: 'Analysis cancelled', detail: 'The analysis was cancelled.' }));
+      reject(appError('UNKNOWN', { title: 'Analiză anulată', detail: 'Analiza a fost anulată.' }));
       return;
     }
     const timer = setTimeout(resolve, ms);
@@ -44,7 +44,7 @@ function sleep(ms: number, signal?: AbortSignal): Promise<void> {
       'abort',
       () => {
         clearTimeout(timer);
-        reject(appError('UNKNOWN', { title: 'Analysis cancelled', detail: 'The analysis was cancelled.' }));
+        reject(appError('UNKNOWN', { title: 'Analiză anulată', detail: 'Analiza a fost anulată.' }));
       },
       { once: true },
     );
