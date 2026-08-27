@@ -1,0 +1,68 @@
+name: Deploy to GitHub Pages
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Typecheck
+        run: npm run typecheck
+
+      - name: Test
+        run: npm test
+
+      - name: Build
+        env:
+          # Project sites are served from https://<owner>.github.io/<repo>/ ,
+          # so the bundle must be built with that sub-path as its base.
+          # For a user/organisation site or a custom domain, set the repository
+          # variable VITE_BASE_PATH to "/" instead.
+          VITE_BASE_PATH: ${{ vars.VITE_BASE_PATH || format('/{0}/', github.event.repository.name) }}
+          VITE_SUPABASE_URL: ${{ vars.VITE_SUPABASE_URL }}
+          VITE_SUPABASE_ANON_KEY: ${{ vars.VITE_SUPABASE_ANON_KEY }}
+          VITE_MOCK_MODE: ${{ vars.VITE_MOCK_MODE || 'auto' }}
+          VITE_EXTRACT_FUNCTION_NAME: ${{ vars.VITE_EXTRACT_FUNCTION_NAME || 'extract-label' }}
+          VITE_SOURCE_IMAGE_BUCKET: ${{ vars.VITE_SOURCE_IMAGE_BUCKET || 'label-sources' }}
+          VITE_RETAIN_SOURCE_IMAGE: ${{ vars.VITE_RETAIN_SOURCE_IMAGE || 'true' }}
+          VITE_CM_LOGO_URL: ${{ vars.VITE_CM_LOGO_URL }}
+          VITE_CM_COMPANY_LINE: ${{ vars.VITE_CM_COMPANY_LINE || 'SC COLOR-METAL SRL' }}
+          VITE_APP_VERSION: ${{ github.sha }}
+        run: npm run build
+
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: ./dist
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4
