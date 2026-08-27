@@ -1,0 +1,73 @@
+# ---------------------------------------------------------------------------
+# ONE-TIME BOOTSTRAP — safe to delete once the project files are in the repo.
+#
+# The project was published through the GitHub web interface, which uploads
+# files one directory at a time. To avoid ~30 separate commits, the whole
+# project was uploaded as a single archive and this workflow expands it into
+# the repository, then removes the archive.
+#
+# It skips .github/ on purpose: the default GITHUB_TOKEN is not allowed to
+# create or modify workflow files, so .github/workflows/deploy.yml is added
+# separately.
+# ---------------------------------------------------------------------------
+name: Bootstrap project files
+
+on:
+  push:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: bootstrap
+  cancel-in-progress: false
+
+jobs:
+  expand:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Look for an archive to expand
+        id: check
+        run: |
+          if ls *.zip >/dev/null 2>&1; then
+            echo "found=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "No archive in the repository root - nothing to do."
+            echo "found=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Expand the archive into the repository
+        if: steps.check.outputs.found == 'true'
+        run: |
+          set -euo pipefail
+          ARCHIVE="$(ls *.zip | head -1)"
+          echo "Expanding $ARCHIVE"
+          mkdir -p /tmp/expand
+          unzip -q "$ARCHIVE" -d /tmp/expand
+          SRC="$(find /tmp/expand -mindepth 1 -maxdepth 1 -type d | head -1)"
+          if [ -z "$SRC" ]; then SRC=/tmp/expand; fi
+          echo "Source directory: $SRC"
+          # --delete makes the repository match the archive exactly, so files
+          # removed from the project disappear here too. .git and .github are
+          # excluded, and rsync never deletes excluded paths.
+          rsync -a --delete --exclude '.git' --exclude '.github' "$SRC"/ ./
+          rm -f "$ARCHIVE"
+          echo "--- resulting top level ---"
+          ls -la
+
+      - name: Commit the expanded project
+        if: steps.check.outputs.found == 'true'
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          if git diff --cached --quiet; then
+            echo "Nothing to commit."
+            exit 0
+          fi
+          git commit -m "Sync project files from uploaded archive"
+          git push
